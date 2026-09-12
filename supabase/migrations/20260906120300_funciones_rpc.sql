@@ -154,7 +154,7 @@ begin
     returning * into v_reserva;
   exception
     when unique_violation then
-      get stacked diagnostics v_constraint = pg_exception_constraint;
+      get stacked diagnostics v_constraint = constraint_name;
       if v_constraint = 'reserva_usuario_horario_unico' then
         raise exception 'Ya tenés una reserva para ese día y ese horario';
       else
