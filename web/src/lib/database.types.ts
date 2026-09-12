@@ -1,0 +1,462 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
+  public: {
+    Tables: {
+      cancha: {
+        Row: {
+          activa: boolean
+          capacidad: number
+          id: string
+          numero: number
+          precio_base: number
+          sede_id: string
+        }
+        Insert: {
+          activa?: boolean
+          capacidad: number
+          id?: string
+          numero: number
+          precio_base: number
+          sede_id: string
+        }
+        Update: {
+          activa?: boolean
+          capacidad?: number
+          id?: string
+          numero?: number
+          precio_base?: number
+          sede_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cancha_sede_id_fkey"
+            columns: ["sede_id"]
+            isOneToOne: false
+            referencedRelation: "sede"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      empleado: {
+        Row: {
+          activo: boolean
+          id: string
+          rol: string
+          sede_id: string
+          usuario_id: string
+        }
+        Insert: {
+          activo?: boolean
+          id?: string
+          rol?: string
+          sede_id: string
+          usuario_id: string
+        }
+        Update: {
+          activo?: boolean
+          id?: string
+          rol?: string
+          sede_id?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "empleado_sede_id_fkey"
+            columns: ["sede_id"]
+            isOneToOne: false
+            referencedRelation: "sede"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "empleado_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: true
+            referencedRelation: "usuario"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pago: {
+        Row: {
+          comprobante_email: string | null
+          comprobante_enviado: boolean
+          created_at: string
+          estado: string
+          fecha_pago: string | null
+          id: string
+          monto: number
+          mp_payment_id: string | null
+          reserva_id: string
+        }
+        Insert: {
+          comprobante_email?: string | null
+          comprobante_enviado?: boolean
+          created_at?: string
+          estado: string
+          fecha_pago?: string | null
+          id?: string
+          monto: number
+          mp_payment_id?: string | null
+          reserva_id: string
+        }
+        Update: {
+          comprobante_email?: string | null
+          comprobante_enviado?: boolean
+          created_at?: string
+          estado?: string
+          fecha_pago?: string | null
+          id?: string
+          monto?: number
+          mp_payment_id?: string | null
+          reserva_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pago_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: true
+            referencedRelation: "reserva"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reserva: {
+        Row: {
+          cancelada_at: string | null
+          cancelada_por: string | null
+          cancha_id: string
+          created_at: string
+          estado: string
+          fecha: string
+          hora_inicio: string
+          id: string
+          llegada_validada_at: string | null
+          llegada_validada_por: string | null
+          monto_sena: number
+          precio_total: number
+          sena_devuelta: boolean
+          usuario_id: string
+        }
+        Insert: {
+          cancelada_at?: string | null
+          cancelada_por?: string | null
+          cancha_id: string
+          created_at?: string
+          estado?: string
+          fecha: string
+          hora_inicio: string
+          id?: string
+          llegada_validada_at?: string | null
+          llegada_validada_por?: string | null
+          monto_sena?: number
+          precio_total: number
+          sena_devuelta?: boolean
+          usuario_id: string
+        }
+        Update: {
+          cancelada_at?: string | null
+          cancelada_por?: string | null
+          cancha_id?: string
+          created_at?: string
+          estado?: string
+          fecha?: string
+          hora_inicio?: string
+          id?: string
+          llegada_validada_at?: string | null
+          llegada_validada_por?: string | null
+          monto_sena?: number
+          precio_total?: number
+          sena_devuelta?: boolean
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reserva_cancelada_por_fkey"
+            columns: ["cancelada_por"]
+            isOneToOne: false
+            referencedRelation: "empleado"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reserva_cancha_id_fkey"
+            columns: ["cancha_id"]
+            isOneToOne: false
+            referencedRelation: "cancha"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reserva_llegada_validada_por_fkey"
+            columns: ["llegada_validada_por"]
+            isOneToOne: false
+            referencedRelation: "empleado"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reserva_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sede: {
+        Row: {
+          created_at: string
+          direccion: string | null
+          id: string
+          nombre: string
+        }
+        Insert: {
+          created_at?: string
+          direccion?: string | null
+          id?: string
+          nombre: string
+        }
+        Update: {
+          created_at?: string
+          direccion?: string | null
+          id?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
+      usuario: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          telefono: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          nombre: string
+          telefono?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          telefono?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      ahora_local: { Args: never; Returns: string }
+      cancelar_reserva: {
+        Args: { p_reserva_id: string; p_sena_devuelta: boolean }
+        Returns: undefined
+      }
+      confirmar_reserva: { Args: { p_reserva_id: string }; Returns: undefined }
+      crear_reserva: {
+        Args: { p_cancha_id: string; p_fecha: string; p_hora_inicio: string }
+        Returns: {
+          cancelada_at: string | null
+          cancelada_por: string | null
+          cancha_id: string
+          created_at: string
+          estado: string
+          fecha: string
+          hora_inicio: string
+          id: string
+          llegada_validada_at: string | null
+          llegada_validada_por: string | null
+          monto_sena: number
+          precio_total: number
+          sena_devuelta: boolean
+          usuario_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reserva"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      dias_anticipacion_max: { Args: never; Returns: number }
+      disponibilidad: {
+        Args: { p_cancha_id: string; p_fecha: string }
+        Returns: {
+          hora_inicio: string
+          ocupado: boolean
+          precio: number
+        }[]
+      }
+      empleado_a_cargo: { Args: { p_reserva_id: string }; Returns: string }
+      es_empleado_de_sede: { Args: { p_sede_id: string }; Returns: boolean }
+      es_turno_valido: { Args: { p_hora: string }; Returns: boolean }
+      factor_recargo: { Args: never; Returns: number }
+      hora_primer_turno: { Args: never; Returns: string }
+      hora_recargo_desde: { Args: never; Returns: string }
+      hora_ultimo_turno: { Args: never; Returns: string }
+      max_reservas_activas: { Args: never; Returns: number }
+      mi_empleado: {
+        Args: never
+        Returns: {
+          empleado_id: string
+          sede_id: string
+        }[]
+      }
+      monto_sena_default: { Args: never; Returns: number }
+      ocupacion_del_dia: {
+        Args: { p_fecha: string; p_sede_id: string }
+        Returns: {
+          cancha_id: string
+          turnos_libres: number
+        }[]
+      }
+      precio_turno: {
+        Args: { p_hora: string; p_precio_base: number }
+        Returns: number
+      }
+      sede_de_cancha: { Args: { p_cancha_id: string }; Returns: string }
+      validar_llegada: { Args: { p_reserva_id: string }; Returns: undefined }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const

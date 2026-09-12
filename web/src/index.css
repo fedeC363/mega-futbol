@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens de Mega Futbol (spec de frontend, seccion 1).
+ * Los bocetos no son el diseño final: cualquier ajuste de paleta o
+ * tipografia se hace aca y se propaga a todos los componentes.
+ */
+@theme {
+  --color-night: #08110c;      /* fondo detras de la app (desktop) */
+  --color-pitch: #0e1b14;      /* fondo principal */
+  --color-pitch-2: #142a1e;    /* header, rail, superficies elevadas */
+  --color-panel: #16281d;      /* paneles, tarjetas */
+  --color-turf: #1f6e43;       /* cancha disponible (base) */
+  --color-turf-light: #2c8a56; /* cancha disponible (acento) */
+  --color-occupied: #3a473f;   /* cancha ocupada */
+  --color-orange: #f2622e;     /* acento UNICO de accion */
+  --color-ink: #1a0c05;        /* texto sobre naranja */
+  --color-cream: #f3ede1;      /* texto principal */
+  --color-cream-dim: #9fb3a6;  /* texto secundario */
+
+  --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-subir: subir 0.28s cubic-bezier(0.22, 0.9, 0.35, 1);
+  @keyframes subir {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+  body {
+    background: var(--color-pitch);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* El selector de fecha nativo, legible sobre fondo oscuro. */
+  input[type="date"] {
+    color-scheme: dark;
+  }
+}
+
+/* Hatcheo de cesped de las canchas disponibles. */
+@utility bg-hatch-turf {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-turf) 0 10px,
+    var(--color-turf-light) 10px 20px
+  );
+}
+
+/* Hatcheo tenue de las zonas no interactivas (predio, estacionamiento). */
+@utility bg-hatch-zone {
+  background: repeating-linear-gradient(
+    135deg,
+    rgb(243 237 225 / 0.03) 0 10px,
+    rgb(243 237 225 / 0.06) 10px 20px
+  );
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
