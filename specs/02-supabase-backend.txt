@@ -1,0 +1,180 @@
+MEGA FUTBOL - BACKEND EN SUPABASE (RLS, FUNCIONES Y EDGE FUNCTIONS)
+Spec 02 de 6 - requiere haber leido 00 y 01
+======================================================================
+
+PRINCIPIO GENERAL
+--------------------
+No hay servidor propio. El frontend usa @supabase/supabase-js
+directamente contra el proyecto de Supabase. La seguridad vive en la
+base de datos:
+
+- Lecturas y escrituras simples (leer canchas, leer mi perfil) se
+  resuelven con Row Level Security (RLS) sobre las tablas.
+- Escrituras con logica de negocio (crear una reserva, validar
+  llegada, cancelar) se resuelven con funciones de Postgres (RPC),
+  llamadas desde el frontend con supabase.rpc('nombre_funcion', {...}).
+- Lo que necesita un secreto que nunca debe llegar al navegador
+  (token de Mercado Pago, API key del servicio de mail) se resuelve
+  con Edge Functions.
+
+AUTENTICACION
+---------------
+Se usa Supabase Auth con email + password:
+- Registro: supabase.auth.signUp({ email, password, options: { data:
+  { nombre } } })  -- el "nombre" viaja en los metadatos y el trigger
+  on_auth_user_created lo copia a public.usuario.
+- Login: supabase.auth.signInWithPassword({ email, password })
+- Sesion: supabase-js maneja el token y el refresh solo.
+- Para saber si el usuario logueado es empleado (y de que sede), se
+  puede exponer una funcion auxiliar:
+    function mi_empleado() -- SECURITY INVOKER
+      returns table(empleado_id uuid, sede_id uuid)
+      as $$ select id, sede_id from empleado
+             where usuario_id = auth.uid() and activo $$;
+
+ROW LEVEL SECURITY POR TABLA
+--------------------------------
+usuario:
+  - SELECT: auth.uid() = id (cada uno ve/edita solo su propio perfil)
+  - UPDATE: auth.uid() = id
+  - INSERT: solo la via el trigger (no hace falta policy de insert para
+    el cliente)
+
+sede, cancha:
+  - SELECT: true para todos (incluido anon) -- navegacion publica
+  - INSERT/UPDATE/DELETE: sin policy para anon/authenticated (se
+    administran por migracion o desde el dashboard, no desde la app)
+
+reserva:
+  - SELECT: auth.uid() = usuario_id
+            OR existe una fila en empleado con usuario_id = auth.uid()
+               y empleado.sede_id = (select sede_id from cancha where
+               cancha.id = reserva.cancha_id)
+    (es decir: el dueno de la reserva, o cualquier empleado de la sede
+    de esa cancha)
+  - INSERT/UPDATE: SIN policy para anon/authenticated. Se revocan los
+    privilegios de INSERT/UPDATE sobre la tabla para esos roles
+    (revoke insert, update on reserva from authenticated, anon). Toda
+    escritura pasa por las funciones de abajo, que corren como
+    SECURITY DEFINER.
+
+empleado:
+  - SELECT: auth.uid() = usuario_id (cada empleado puede confirmar que
+    el mismo es staff; no hace falta que vean la lista de otros
+    empleados para el MVP)
+
+pago (fase 2):
+  - SELECT: mismo criterio que reserva (dueno o staff de la sede),
+    uniendo por reserva_id
+  - INSERT/UPDATE: ninguna policy para anon/authenticated. Solo la
+    Edge Function del webhook escribe aca, usando la service role key
+    (que ignora RLS por completo).
+
+FUNCIONES DE POSTGRES (RPC)
+-------------------------------
+Todas SECURITY DEFINER (corren con permisos elevados, pero validan
+"a mano" quien puede hacer que):
+
+1) disponibilidad(p_cancha_id uuid, p_fecha date)
+   returns table(hora_inicio time, ocupado boolean, precio numeric)
+   - Genera los turnos de 1 hora del dia (rango horario a definir con
+     Federico, ej 08:00 a 23:00) y marca cuales ya tienen una reserva
+     activa (estado <> 'cancelada') para esa cancha/fecha.
+   - Calcula el precio de cada turno: precio_base, +10% si
+     hora_inicio >= '19:00'.
+   - No requiere login (accesible por anon).
+
+2) crear_reserva(p_cancha_id uuid, p_fecha date, p_hora_inicio time)
+   returns reserva
+   - Requiere auth.uid() no nulo (si es null, lanzar excepcion).
+   - Busca precio_base de la cancha.
+   - Calcula precio_total (con recargo si corresponde) y fija
+     monto_sena en 15000.
+   - Inserta la reserva con usuario_id = auth.uid() y estado inicial
+     'pendiente_pago' (ver spec 03 para como se trata ese estado en el
+     MVP, antes de tener pagos reales).
+   - Si ya existe una reserva activa para ese turno, el unique index
+     parcial de la tabla lanza un error de Postgres: capturarlo y
+     relanzar un mensaje claro ("Ese turno ya fue reservado").
+
+3) validar_llegada(p_reserva_id uuid)
+   returns void
+   - Verifica que auth.uid() pertenezca a un empleado de la misma sede
+     que la cancha de esa reserva (si no, lanzar excepcion de permiso).
+   - Actualiza llegada_validada_at = now(), llegada_validada_por = id
+     del empleado que llama.
+
+4) cancelar_reserva(p_reserva_id uuid, p_sena_devuelta boolean)
+   returns void
+   - Mismo chequeo de "es empleado de esa sede" que validar_llegada.
+   - Actualiza estado = 'cancelada', cancelada_at = now(),
+     cancelada_por = id del empleado, sena_devuelta = p_sena_devuelta.
+   - Al pasar a 'cancelada', el indice unico parcial deja de contar esa
+     fila, asi que el turno queda libre automaticamente para una nueva
+     reserva.
+
+EDGE FUNCTIONS (fase 2, Deno/TypeScript en supabase/functions/)
+--------------------------------------------------------------------
+1) crear-preferencia-pago
+   - La llama el frontend (usuario autenticado) pasando reserva_id.
+   - Usa el MERCADOPAGO_ACCESS_TOKEN (guardado como secreto de
+     Supabase, nunca en el frontend) para crear una preferencia/QR de
+     pago por el monto_sena de esa reserva.
+   - Devuelve al frontend los datos necesarios para mostrar el QR.
+
+2) webhook-mercadopago
+   - Endpoint publico que Mercado Pago llama cuando cambia el estado
+     de un pago. Verifica que la notificacion sea autentica (firma /
+     validacion segun la documentacion de Mercado Pago).
+   - Si el pago fue aprobado: usa el cliente de Supabase con la
+     service role key (bypassea RLS) para (a) insertar/actualizar la
+     fila en pago, (b) pasar la reserva asociada a estado
+     'confirmada'.
+   - Dispara el envio del comprobante por mail (puede ser en la misma
+     funcion o llamando a otra) usando el proveedor de mail elegido
+     (ver spec 05) y marca comprobante_enviado = true en pago.
+
+FLUJO DE TRABAJO CONTRA SUPABASE EN LA NUBE
+-----------------------------------------------
+Se trabaja directo contra el proyecto en la nube, sin stack local ni
+Docker. Los comandos se corren con `npx supabase ...` (ver spec 05).
+
+Una sola vez por maquina:
+- supabase login                    -- abre el navegador y guarda un token
+                                        de acceso de la cuenta de Supabase
+- supabase link --project-ref btnfakfcyqccgshpmzrp
+                                     -- conecta el repo al proyecto; pide la
+                                        password de la base de datos
+                                        (Project Settings > Database)
+
+Ciclo de cada cambio de esquema:
+- supabase migration new <nombre>   -- crea un archivo SQL vacio en
+                                        supabase/migrations/
+- supabase db push --dry-run        -- muestra que migraciones se
+                                        aplicarian, sin tocar nada
+- supabase db push                  -- aplica las migraciones pendientes al
+                                        proyecto en la nube
+- supabase migration list           -- compara las migraciones del repo con
+                                        las ya aplicadas en la nube
+
+IMPORTANTE: una migracion que ya se aplico con `db push` NO se edita.
+Si hay que corregir algo, se crea una migracion nueva que lo arregle.
+Como no hay base local descartable, `db reset` no forma parte del
+flujo: resetear seria borrar los datos reales del proyecto.
+
+Edge Functions (fase 2):
+- supabase functions new <nombre>   -- crea una Edge Function nueva
+- supabase functions deploy <nombre> -- la sube al proyecto
+- supabase secrets set NOMBRE=valor -- carga un secreto (token de Mercado
+                                        Pago, API key de mail) para las
+                                        Edge Functions
+
+Opcional, solo si se instala Docker Desktop: `supabase start` levanta un
+stack local descartable, `supabase db reset` le aplica todas las
+migraciones desde cero y `supabase functions serve` corre las Edge
+Functions en local.
+
+Cada tabla, policy y funcion de este spec debe quedar como una
+migracion SQL versionada en supabase/migrations/, no aplicada a mano
+desde el dashboard, para que el esquema completo se pueda reconstruir
+desde el repo en cualquier momento.

@@ -1,0 +1,135 @@
+MEGA FUTBOL - DEPENDENCIAS Y SETUP (STACK SUPABASE)
+Spec 05 de 6 - requiere haber leido 00, 01, 02, 03 y 04
+============================================================
+
+CUENTAS Y HERRAMIENTAS (fuera del codigo)
+----------------------------------------------
+- Cuenta en https://supabase.com y un proyecto nuevo (el plan gratuito
+  alcanza para este tamano de proyecto).
+- Node.js (LTS) instalado, para correr el frontend y la CLI de
+  Supabase.
+- Docker Desktop: NO hace falta para trabajar. El flujo principal es
+  contra el proyecto de Supabase en la nube (ver spec 02). Docker solo
+  se necesita si mas adelante se quiere un stack local descartable con
+  `supabase start` (util para probar Edge Functions en la Fase 2).
+- Cuenta de Mercado Pago Developers (recien para la Fase 2), para
+  obtener el Access Token de prueba y de produccion.
+- Cuenta en un proveedor de mail transaccional (recien para la Fase 2):
+  Resend o SendGrid son las opciones mas simples para mandar el
+  comprobante de la sena.
+
+REPOSITORIO EN GITHUB
+--------------------------
+Repo: https://github.com/fedeC363/mega-futbol
+
+Primer push, parado en la raiz del proyecto (despues de `git init`,
+`git add .` y el primer commit):
+
+  git remote add origin https://github.com/fedeC363/mega-futbol.git
+  git branch -M main
+  git push -u origin main
+
+De ahi en adelante, cada avance es el ciclo de siempre: `git add .`,
+`git commit -m "mensaje"`, `git push`. Revisar que el `.gitignore` este
+en la raiz ANTES del primer commit para no subir `node_modules/` ni
+ningun `.env` con secretos.
+
+HERRAMIENTA DE LINEA DE COMANDOS
+-------------------------------------
+- Supabase CLI. No se instala globalmente con npm: Supabase dejo de
+  soportar `npm install -g supabase`. Opciones:
+    npx supabase <comando>               (cualquier SO con Node, sin
+                                          instalar nada; es la que usa
+                                          este proyecto)
+    scoop install supabase               (Windows con Scoop)
+    brew install supabase/tap/supabase   (macOS con Homebrew)
+  Todos los comandos de los specs se escriben como `supabase ...`; con
+  npx se antepone `npx`: `npx supabase db push`.
+  Se usa para: crear y aplicar migraciones al proyecto en la nube,
+  desplegar Edge Functions y cargar secretos (ver comandos en el
+  spec 02).
+
+- Proyecto en la nube de este repo:
+    project ref: btnfakfcyqccgshpmzrp
+    URL:         https://btnfakfcyqccgshpmzrp.supabase.co
+  (el project ref y la URL no son secretos)
+
+- Deno (opcional pero recomendado). El Supabase CLI ya trae lo
+  necesario para correr las Edge Functions en local, pero instalar
+  Deno aparte mejora el autocompletado y el chequeo de tipos en el
+  editor mientras se escriben.
+
+DEPENDENCIAS DEL FRONTEND (/web) - package.json
+----------------------------------------------------
+dependencies:
+  - react
+  - react-dom
+  - @supabase/supabase-js        -- cliente para hablar con Supabase
+                                     (auth, tablas, RPC) desde el navegador
+  - react-router-dom              -- ruteo entre pantallas
+
+devDependencies:
+  - vite                          -- bundler/dev server
+  - @vitejs/plugin-react
+
+El framework de estilos (CSS plano, Tailwind, styled-components, etc.)
+queda a criterio de Federico segun como vengan armados sus mockups; no
+esta impuesto por este spec.
+
+DEPENDENCIAS DEL LADO DE SUPABASE (/supabase)
+--------------------------------------------------
+Esta carpeta NO es un proyecto Node con su propio package.json. La
+tienen:
+
+- supabase/config.toml            -- generado por `supabase init`
+- supabase/migrations/*.sql       -- una migracion por cambio de esquema
+                                      (tablas, RLS, funciones)
+- supabase/functions/<nombre>/    -- una carpeta por Edge Function
+
+Las Edge Functions corren en Deno y sus dependencias se importan por
+URL directamente en el archivo, no hay npm install:
+  - https://esm.sh/@supabase/supabase-js@2   -- cliente admin dentro de
+                                                 la funcion (usa la
+                                                 service role key)
+  - fetch nativo de Deno para llamar a la API de Mercado Pago (no hace
+    falta ningun SDK aparte)
+  - https://esm.sh/resend  (si se elige Resend para el mail; cambiar
+    por el SDK correspondiente si se usa otro proveedor)
+
+VARIABLES DE ENTORNO
+-------------------------
+Frontend (/web/.env, con prefijo VITE_ para que Vite las exponga al
+navegador — estos dos valores NO son secretos, son publicos por
+diseno):
+  VITE_SUPABASE_URL=
+  VITE_SUPABASE_ANON_KEY=
+Supabase ahora entrega la clave publica con el formato
+`sb_publishable_...` (reemplaza a la vieja "anon key" JWT). Va en
+VITE_SUPABASE_ANON_KEY igual; supabase-js la acepta sin cambios.
+
+Variables que las Edge Functions reciben SOLAS en la nube (no se
+cargan a mano; el CLI incluso rechaza secretos que empiecen con
+SUPABASE_):
+  SUPABASE_URL
+  SUPABASE_ANON_KEY
+  SUPABASE_SERVICE_ROLE_KEY   -- salta el RLS; ojo con no exponerla
+                                  nunca en el cliente
+
+Secretos propios (se cargan con `supabase secrets set NOMBRE=valor` y
+solo los usan las Edge Functions; NUNCA van en el frontend ni se suben
+al repo):
+  MERCADOPAGO_ACCESS_TOKEN     -- fase 2
+  RESEND_API_KEY (o el que corresponda al proveedor elegido) -- fase 2
+
+QUE YA NO HACE FALTA (vs. el intento anterior con Express/Prisma)
+------------------------------------------------------------------------
+- El docker-compose.yml propio para levantar Postgres (Supabase CLI ya
+  lo resuelve con `supabase start`).
+- Prisma y sus migraciones (se reemplaza por las migraciones SQL de
+  supabase/migrations/).
+- Un servidor Express, y con el, dependencias como express, cors,
+  jsonwebtoken o bcrypt (Supabase Auth reemplaza el manejo de
+  contrasenas y tokens).
+- Una variable DATABASE_URL propia en el backend (Supabase la expone
+  igual si hiciera falta una conexion directa, pero no es necesaria
+  para el flujo normal de la app).

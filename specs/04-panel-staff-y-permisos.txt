@@ -1,0 +1,52 @@
+MEGA FUTBOL - PANEL DE STAFF Y PERMISOS
+Spec 04 de 6 - requiere haber leido 00, 01, 02 y 03
+========================================================
+
+QUIEN ES "STAFF"
+-------------------
+Un usuario es empleado si existe un registro suyo en la tabla
+empleado (usuario_id -> empleado.usuario_id) con activo = true. No
+hace falta un rol especial en Supabase Auth: la unica fuente de verdad
+de "quien es staff" es esa tabla, consultada por las policies de RLS y
+por las funciones (validar_llegada, cancelar_reserva).
+
+PERMISOS ACTUALES: SIN JERARQUIA
+------------------------------------
+Hoy TODOS los empleados pueden hacer TODO lo del panel de staff. No
+hay un rol de "encargado" con mas permisos que otro empleado.
+
+La tabla empleado tiene un campo "rol" (default 'staff') para no tener
+que migrar el esquema el dia de manana si Federico decide diferenciar
+permisos. Mientras tanto, ni las policies de RLS ni las funciones RPC
+deben leer ese campo para decidir nada: cualquier fila activa en
+empleado alcanza para tener acceso completo al panel de staff.
+
+FUNCIONALIDADES DEL PANEL DE STAFF
+---------------------------------------
+1. Ver la agenda del dia: todos los turnos de todas las canchas de su
+   sede, con los datos del usuario que reservo (nombre, telefono) para
+   poder contactarlo si hace falta. Esto es un select directo a la
+   tabla reserva (haciendo join con usuario del lado del cliente o con
+   una vista), permitido por la policy de RLS de reserva para
+   empleados de esa sede.
+
+2. Marcar que un usuario llego y arranco a jugar:
+   supabase.rpc('validar_llegada', { p_reserva_id }).
+
+3. Cancelar una reserva y registrar si la sena fue devuelta o no:
+   supabase.rpc('cancelar_reserva', { p_reserva_id, p_sena_devuelta }).
+
+Nada de esto requiere pantallas de configuracion de permisos ni
+gestion de usuarios empleados desde la propia app: por ahora, dar de
+alta un empleado nuevo puede hacerse directamente en la tabla
+empleado (por SQL o desde el Table Editor de Supabase), no hace falta
+una pantalla para eso en el MVP.
+
+MULTI-SEDE (a futuro, no implementar todavia)
+--------------------------------------------------
+Hoy hay una sola sede (San Justo), pero el modelo de datos y las
+policies de RLS ya usan sede_id para decidir que empleado ve que
+reservas. Esto significa que agregar una sede nueva mas adelante no
+deberia requerir cambios de esquema ni de policies, solo cargar los
+datos de la sede nueva, sus canchas, y dar de alta empleados asociados
+a ella.

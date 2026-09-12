@@ -1,0 +1,155 @@
+MEGA FUTBOL - MODELO DE DATOS (SUPABASE / POSTGRES)
+Spec 01 de 6 - requiere haber leido 00-vision-y-reglas-de-negocio.txt
+=======================================================================
+
+Todas las tablas viven en el schema "public" de Supabase, salvo
+auth.users que ya la maneja Supabase por su cuenta. Los ids son uuid
+(gen_random_uuid() o el default de Supabase) salvo que se indique otra
+cosa.
+
+TABLA: usuario  (extiende a auth.users, no la reemplaza)
+-----------------------------------------------------------
+- id             uuid, PK, references auth.users(id) on delete cascade
+- nombre         text, not null
+- telefono       text, nullable
+- created_at     timestamptz, default now()
+
+Notas:
+- El email y la contrasena los maneja Supabase Auth (auth.users), NO se
+  duplican en esta tabla.
+- Un trigger sobre auth.users (on insert) crea automaticamente la fila
+  correspondiente en public.usuario, tomando el nombre de los metadatos
+  del registro (raw_user_meta_data->>'nombre'). Esto es un patron
+  estandar de Supabase (funcion handle_new_user() + trigger
+  on_auth_user_created). Documentarlo en la migracion.
+- Un empleado tambien es un usuario (ver tabla empleado). No hay tabla
+  separada de "clientes".
+
+TABLA: sede
+------------
+- id           uuid, PK
+- nombre       text, not null           -- "San Justo" es el unico dato hoy
+- direccion    text, nullable
+- created_at   timestamptz, default now()
+
+TABLA: cancha
+--------------
+- id            uuid, PK
+- sede_id       uuid, FK -> sede.id, not null
+- numero        int, not null
+- capacidad     int, not null
+- precio_base   numeric(10,2), not null   -- precio por turno de 1h, sin recargo
+- activa        boolean, default true     -- para dar de baja una cancha sin borrarla
+- constraint UNIQUE(sede_id, numero)
+
+TABLA: reserva
+---------------
+- id                    uuid, PK
+- cancha_id             uuid, FK -> cancha.id, not null
+- usuario_id            uuid, FK -> usuario.id, not null
+- fecha                 date, not null
+- hora_inicio           time, not null       -- hora_fin se calcula como +1h, no se guarda
+- precio_total          numeric(10,2), not null   -- calculado en la funcion crear_reserva, YA con recargo si aplica
+- monto_sena            numeric(10,2), not null, default 15000
+- estado                text, check in ('pendiente_pago','confirmada','cancelada','completada','no_show')
+- llegada_validada_at   timestamptz, nullable
+- llegada_validada_por  uuid, FK -> empleado.id, nullable
+- cancelada_at          timestamptz, nullable
+- cancelada_por         uuid, FK -> empleado.id, nullable
+- sena_devuelta         boolean, default false   -- registro manual de que el staff devolvio la sena
+- created_at            timestamptz, default now()
+
+Constraints importantes:
+- UNIQUE INDEX parcial en (cancha_id, fecha, hora_inicio) para toda
+  reserva cuyo estado NO sea 'cancelada'. Evita que dos reservas
+  activas ocupen el mismo turno de la misma cancha, incluso si dos
+  requests llegan al mismo tiempo (esto lo garantiza Postgres, no hace
+  falta logica extra en el frontend).
+  Ejemplo: create unique index reserva_turno_unico on reserva
+  (cancha_id, fecha, hora_inicio) where estado <> 'cancelada';
+- Indice en (cancha_id, fecha) para consultas de disponibilidad rapidas.
+- IMPORTANTE (ver spec 02): los roles "authenticated" y "anon" NO tienen
+  permiso de INSERT/UPDATE directo sobre esta tabla. Toda escritura pasa
+  por las funciones crear_reserva, validar_llegada y cancelar_reserva.
+
+TABLA: empleado
+----------------
+- id            uuid, PK
+- usuario_id    uuid, FK -> usuario.id, not null, unique
+- sede_id       uuid, FK -> sede.id, not null
+- rol           text, default 'staff'   -- hoy sin diferenciacion de permisos, dejar preparado
+- activo        boolean, default true
+
+TABLA: pago  (FASE 2 - no se implementa en el MVP, pero dejar modelada)
+-------------------------------------------------------------------------
+- id                    uuid, PK
+- reserva_id            uuid, FK -> reserva.id, not null, unique
+- mp_payment_id         text, nullable    -- id que devuelve Mercado Pago
+- monto                 numeric(10,2), not null   -- 15000
+- estado                text, check in ('pendiente','aprobado','rechazado','expirado')
+- fecha_pago            timestamptz, nullable
+- comprobante_enviado   boolean, default false
+- comprobante_email     text   -- copia del email al momento del pago
+- created_at            timestamptz, default now()
+
+Esta tabla solo la escribe la Edge Function del webhook de Mercado Pago,
+usando la service role key (que ignora RLS). Ningun cliente (anon ni
+authenticated) escribe en pago directamente.
+
+NOTAS DE DISENO
+-----------------
+- precio_total se calcula y se guarda en el momento de crear la
+  reserva (dentro de la funcion crear_reserva), no se recalcula
+  despues. Asi, si cambia el precio_base de una cancha mas adelante,
+  las reservas viejas no se ven afectadas.
+
+- El estado 'pendiente_pago' deberia expirar solo despues de un tiempo
+  razonable si no hay pago confirmado (sugerido: 15 minutos), liberando
+  el turno. Esto tiene sentido implementarlo junto con la Fase 2 (pago
+  real), por ejemplo con un cron de Supabase (pg_cron o una Edge
+  Function programada) que cancele las reservas vencidas.
+
+- Todas las fechas y horas se guardan y se comparan asumiendo
+  America/Argentina/Buenos_Aires (ver spec 00, regla 12). Configurar el
+  timezone de la base o convertir explicitamente en las funciones.
+
+- El campo "rol" en empleado no debe usarse todavia para bloquear
+  ninguna accion: hoy cualquier fila en empleado alcanza para tener
+  acceso completo al panel de staff (ver spec 04).
+
+RELACIONES (resumen)
+----------------------
+auth.users 1---1 usuario
+sede 1---N cancha
+sede 1---N empleado
+cancha 1---N reserva
+usuario 1---N reserva
+usuario 1---0..1 empleado
+reserva 1---0..1 pago   (fase 2)
+
+DATOS INICIALES (SEED) - CANCHAS DE SAN JUSTO
+--------------------------------------------------
+Datos reales confirmados por Federico. Van todas con sede_id = San
+Justo, activa = true. El campo capacidad es la cantidad total de
+jugadores del partido (no por equipo).
+
+Total: 20 canchas
+
+  cantidad | numero sugerido | capacidad | precio_base
+  ---------|------------------|-----------|-------------
+  6        | 1 a 6            | 10        | $40.000   (fútbol 5)
+  4        | 7 a 10           | 12        | $52.000   (fútbol 6)
+  6        | 11 a 16          | 14        | $60.000   (fútbol 7)
+  4        | 17 a 20          | 16        | $72.000   (fútbol 8)
+
+Nota: la "modalidad" (fútbol 5/6/7/8) hoy se puede derivar de la
+capacidad uno a uno (10→5, 12→6, 14→7, 16→8), así que no hace falta
+una columna aparte para el MVP. Si mas adelante se quiere mostrar la
+etiqueta "Fútbol 6" directamente en el front sin calcularla, se puede
+agregar una columna `modalidad text` a la tabla cancha en una
+migracion nueva — no rompe nada de lo ya definido.
+
+Nota de negocio (cierra el punto abierto de la regla 5 del spec 00):
+con estos precios reales, el precio_base mínimo es $40.000, siempre
+por encima de la seña de $15.000 — el caso "seña mayor al precio
+total" no se da con las canchas actuales.

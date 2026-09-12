@@ -1,0 +1,88 @@
+MEGA FUTBOL - FLUJO DE RESERVA Y PAGOS
+Spec 03 de 6 - requiere haber leido 00, 01 y 02
+===================================================
+
+FASE 1 - MVP (sin integrar el pago todavia)
+-----------------------------------------------
+1. El usuario navega la pagina sin loguearse y ve el mapa de canchas
+   (el front lo arma Federico; este spec solo define que datos hacen
+   falta: select directo a la tabla cancha via supabase-js, permitido
+   por la policy de SELECT publica).
+
+2. El usuario elige una cancha y ve la disponibilidad de fecha y
+   horario llamando a supabase.rpc('disponibilidad', { p_cancha_id,
+   p_fecha }).
+
+3. Si el usuario no esta logueado y quiere reservar, se le pide
+   login o registro (Supabase Auth).
+
+4. Para reservar, el frontend llama a
+   supabase.rpc('crear_reserva', { p_cancha_id, p_fecha,
+   p_hora_inicio }).
+
+   DECISION PARA EL MVP: como todavia no hay integracion de pago, la
+   reserva se crea igual en estado 'pendiente_pago', pero se sigue
+   mostrando en la agenda del staff (la policy de SELECT de reserva ya
+   contempla a los empleados de la sede, sin importar el estado). No
+   hace falta logica de expiracion todavia: eso se suma recien en la
+   Fase 2, junto con el pago real. La idea es no tener que reescribir
+   el modelo cuando se integre Mercado Pago, solo agregar el paso de
+   pago en el medio.
+
+5. El empleado ve la reserva en su agenda (select a la tabla reserva,
+   filtrado por fecha en el frontend; RLS ya restringe a su sede).
+
+6. El dia del turno, el empleado valida que el usuario llego y arranco
+   a jugar llamando a supabase.rpc('validar_llegada', { p_reserva_id }).
+
+FASE 2 - agregar el pago real de la sena
+--------------------------------------------
+7. Al crear la reserva (o justo despues), el frontend llama a la Edge
+   Function crear-preferencia-pago con el reserva_id, que genera el QR
+   de Mercado Pago por el monto de la sena ($15.000).
+
+8. Mercado Pago avisa por webhook cuando el pago se aprueba (la Edge
+   Function webhook-mercadopago). En ese momento la reserva pasa a
+   'confirmada' y el turno queda bloqueado para el resto (el indice
+   unico parcial de la tabla reserva ya lo garantiza a nivel de base
+   de datos).
+
+9. La misma Edge Function (o una aparte) envia el comprobante de pago
+   al Gmail del usuario.
+
+10. Si el usuario no paga dentro de un tiempo razonable (sugerido: 15
+    minutos), la reserva deberia pasar a 'cancelada' automaticamente
+    para liberar el turno. Implementarlo con un cron (pg_cron o una
+    Edge Function programada con Supabase Scheduled Functions) que
+    revise las reservas 'pendiente_pago' vencidas. Esto recien tiene
+    sentido junto con los pasos 7-9, no antes.
+
+CANCELACION (aplica en todas las fases)
+--------------------------------------------
+- No hay boton de autocancelacion para el usuario dentro del sistema.
+- El usuario debe contactar a un empleado por fuera del sistema
+  (whatsapp, telefono, en persona).
+- El empleado, desde el panel de staff, llama a
+  supabase.rpc('cancelar_reserva', { p_reserva_id, p_sena_devuelta })
+  y decide si la sena fue devuelta. La devolucion en si misma (efectivo
+  o transferencia) la hace el staff fuera del sistema, el sistema solo
+  registra que paso.
+- Al cancelar, el indice unico parcial deja de contar esa fila y el
+  turno vuelve a estar disponible automaticamente.
+
+CALCULO DE PRECIO (recordatorio, ver spec 00 reglas 2-5)
+--------------------------------------------------------------
+precio_total = precio_base de la cancha
+             + 10% si hora_inicio >= 19:00
+(la sena de $15.000 es un monto fijo aparte, no un porcentaje del
+precio_total). Este calculo vive DENTRO de las funciones
+disponibilidad() y crear_reserva() en la base de datos — nunca se
+confia en un precio que mande el frontend.
+
+BEELUP Y CONTACTO
+--------------------
+- Beelup: un boton/link visible en la pagina que redirige a
+  https://beelup.com/ar (camaras en vivo del predio), en pestana
+  nueva. No requiere backend propio, es un link externo.
+- Contacto: botones/links directos a WhatsApp e Instagram de Mega
+  Futbol. Tampoco requieren backend propio.

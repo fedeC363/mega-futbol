@@ -1,0 +1,121 @@
+MEGA FUTBOL - VISION Y REGLAS DE NEGOCIO
+Spec 00 de 6 - leer primero
+=========================================
+
+CONTEXTO
+--------
+Mega Futbol es una cadena de canchas de futbol. Este proyecto arranca
+enfocado en una sola sede: San Justo. La idea es que la pagina permita
+reservar una cancha con la minima interaccion humana posible.
+
+STACK Y ALCANCE DE ESTOS SPECS
+---------------------------------
+Backend: Supabase (Postgres administrado + Auth + Row Level Security +
+funciones de Postgres + Edge Functions). NO hay un servidor Node/Express
+propio: el frontend habla directo con Supabase usando la libreria
+supabase-js. Toda la seguridad y la logica de negocio critica vive en
+la base de datos (RLS y funciones), no en un backend intermedio.
+
+Frontend: React. El diseno visual (UI, layout, componentes de pantalla)
+lo define Federico por su cuenta y no esta cubierto en estos specs. No
+asumas ningun estilo ni layout particular: pensa estos documentos como
+contratos de datos y comportamiento.
+
+Estos 6 documentos cubren backend (Supabase), modelo de datos y reglas
+de negocio:
+
+00-vision-y-reglas-de-negocio.txt      (este archivo)
+01-modelo-de-datos.txt
+02-supabase-backend.txt                (RLS, funciones, Edge Functions)
+03-flujo-reserva-y-pagos.txt
+04-panel-staff-y-permisos.txt
+05-dependencias-y-setup.txt
+
+GLOSARIO
+--------
+- Sede: una ubicacion fisica de Mega Futbol (hoy solo "San Justo").
+- Cancha: una cancha de futbol dentro de una sede. Tiene numero,
+  capacidad y precio propio.
+- Turno / reserva: un bloque de 1 hora en una cancha, reservado por un
+  usuario para una fecha y hora especificas.
+- Sena: pago fijo de $15.000 ARS que bloquea un turno.
+- Staff / empleado: persona que trabaja en la sede y usa el panel de
+  staff.
+- RLS (Row Level Security): reglas de Postgres/Supabase que deciden
+  fila por fila quien puede leer o escribir que datos.
+- RPC / funcion de Postgres: una funcion que vive en la base de datos y
+  se llama desde el frontend con supabase.rpc(...), en vez de pegarle a
+  un endpoint REST propio.
+- Edge Function: una funcion serverless (Deno/TypeScript) que corre del
+  lado de Supabase, para lo que necesita un secreto que nunca debe
+  llegar al navegador (por ejemplo, el token de Mercado Pago).
+
+REGLAS DE NEGOCIO CONFIRMADAS
+------------------------------
+1. Un usuario NO logueado puede navegar la pagina y ver el mapa de
+   canchas, pero no puede reservar. Reservar requiere login.
+
+2. Cada cancha tiene numero, capacidad y precio base propios. No todas
+   las canchas cuestan lo mismo ni tienen la misma capacidad.
+
+3. Recargo horario: si el turno empieza a las 19:00 o mas tarde, el
+   precio de esa cancha tiene un recargo del 10% sobre su precio base.
+
+4. Los turnos duran 1 hora. Dos reservas no pueden superponerse en la
+   misma cancha, mismo dia, mismo horario.
+
+5. La sena para reservar es fija: $15.000 ARS, independiente del precio
+   total de la cancha. Con los precios reales de las 20 canchas (ver
+   spec 01), el precio_base mas bajo es $40.000, asi que la sena nunca
+   supera el precio total.
+
+6. El pago de la sena se hace por Mercado Pago (QR). Cuando el pago se
+   confirma, el turno queda bloqueado para el resto de los usuarios.
+   Antes de que se confirme el pago, la reserva existe pero no deberia
+   considerarse garantizada (ver spec 03 sobre expiracion).
+
+7. El resto del monto (precio total menos la sena) se cobra en
+   efectivo o transferencia el dia de juego, en persona, entre el
+   usuario y un empleado. EL SISTEMA NO GESTIONA ESE COBRO. Como mucho
+   puede mostrarlo como referencia (cuanto falta pagar).
+
+8. El comprobante del pago de la sena se envia al Gmail del usuario.
+
+9. El dia del turno, un empleado debe validar manualmente que los
+   usuarios llegaron y arrancaron a jugar. Esto es necesario porque los
+   turnos duran 1 hora pero pueden demorar en arrancar.
+
+10. Cancelacion: no existe autocancelacion para el usuario. Si un
+    usuario quiere cancelar, debe contactar a un empleado del staff por
+    fuera del sistema (whatsapp, telefono, en persona). El acuerdo de
+    devolucion de la sena queda entre ellos. El caso ideal: el staff
+    devuelve la sena por fuera del sistema (efectivo o transferencia) y
+    despues, manualmente, marca esa cancha/turno como disponible de
+    nuevo dentro del sistema.
+
+11. Roles de empleado: por ahora TODOS los empleados tienen los mismos
+    permisos, no hay jerarquia ni permisos diferenciados. El modelo de
+    datos debe dejar un campo "rol" preparado para el futuro, pero la
+    logica de permisos (RLS y funciones) no debe diferenciar todavia.
+
+12. Zona horaria: todo el sistema asume America/Argentina/Buenos_Aires.
+    No hay soporte multi-zona horaria por ahora.
+
+13. Beelup: es un servicio externo de camaras en vivo del predio
+    (https://beelup.com/ar). La unica integracion requerida es un
+    boton/link que redirija a esa URL, idealmente en una pestana nueva.
+    No requiere backend propio ni login combinado.
+
+14. Contacto directo: la pagina debe exponer links directos a WhatsApp
+    e Instagram de Mega Futbol. No hace falta un sistema de mensajeria
+    propio.
+
+FUERA DE ALCANCE POR AHORA
+----------------------------
+- Soporte real para mas de una sede (el modelo lo permite, pero no hay
+  que construir la logica todavia).
+- Notificaciones (recordatorios de turno, avisos push, etc).
+- Reportes para el dueno del negocio.
+- Roles de empleado diferenciados.
+- Devoluciones de dinero automaticas (siempre son manuales, hechas por
+  el staff fuera del sistema).
