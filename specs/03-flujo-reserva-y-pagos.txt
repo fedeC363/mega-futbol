@@ -29,33 +29,44 @@ FASE 1 - MVP (sin integrar el pago todavia)
    el modelo cuando se integre Mercado Pago, solo agregar el paso de
    pago en el medio.
 
-5. El empleado ve la reserva en su agenda (select a la tabla reserva,
-   filtrado por fecha en el frontend; RLS ya restringe a su sede).
+   El frontend NO debe decir "reserva confirmada" en este punto: la
+   reserva existe pero esta pendiente de la sena.
 
-6. El dia del turno, el empleado valida que el usuario llego y arranco
+5. El usuario transfiere la sena de $15.000 por fuera del sistema.
+
+6. El empleado ve la reserva en su agenda (select a la tabla reserva,
+   filtrado por fecha en el frontend; RLS ya restringe a su sede),
+   verifica que la transferencia llego y la confirma llamando a
+   supabase.rpc('confirmar_reserva', { p_reserva_id }). Recien ahi la
+   reserva pasa a 'confirmada'.
+
+7. El dia del turno, el empleado valida que el usuario llego y arranco
    a jugar llamando a supabase.rpc('validar_llegada', { p_reserva_id }).
 
 FASE 2 - agregar el pago real de la sena
 --------------------------------------------
-7. Al crear la reserva (o justo despues), el frontend llama a la Edge
+8. Al crear la reserva (o justo despues), el frontend llama a la Edge
    Function crear-preferencia-pago con el reserva_id, que genera el QR
    de Mercado Pago por el monto de la sena ($15.000).
 
-8. Mercado Pago avisa por webhook cuando el pago se aprueba (la Edge
+9. Mercado Pago avisa por webhook cuando el pago se aprueba (la Edge
    Function webhook-mercadopago). En ese momento la reserva pasa a
-   'confirmada' y el turno queda bloqueado para el resto (el indice
-   unico parcial de la tabla reserva ya lo garantiza a nivel de base
-   de datos).
+   'confirmada' (lo mismo que hoy hace confirmar_reserva a mano) y el
+   turno queda bloqueado para el resto (el indice unico parcial de la
+   tabla reserva ya lo garantiza a nivel de base de datos).
+   confirmar_reserva sigue disponible para el staff como respaldo
+   (por ejemplo, si alguien paga por transferencia igual).
 
-9. La misma Edge Function (o una aparte) envia el comprobante de pago
-   al Gmail del usuario.
+10. La misma Edge Function (o una aparte) envia el comprobante de pago
+    al Gmail del usuario.
 
-10. Si el usuario no paga dentro de un tiempo razonable (sugerido: 15
+11. Si el usuario no paga dentro de un tiempo razonable (sugerido: 15
     minutos), la reserva deberia pasar a 'cancelada' automaticamente
     para liberar el turno. Implementarlo con un cron (pg_cron o una
     Edge Function programada con Supabase Scheduled Functions) que
     revise las reservas 'pendiente_pago' vencidas. Esto recien tiene
-    sentido junto con los pasos 7-9, no antes.
+    sentido junto con los pasos 8-10, no antes: en el MVP la
+    confirmacion es manual y el staff puede tardar mas de 15 minutos.
 
 CANCELACION (aplica en todas las fases)
 --------------------------------------------

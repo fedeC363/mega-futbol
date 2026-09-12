@@ -21,8 +21,11 @@ AUTENTICACION
 ---------------
 Se usa Supabase Auth con email + password:
 - Registro: supabase.auth.signUp({ email, password, options: { data:
-  { nombre } } })  -- el "nombre" viaja en los metadatos y el trigger
-  on_auth_user_created lo copia a public.usuario.
+  { nombre, telefono } } })  -- nombre y telefono viajan en los
+  metadatos y el trigger on_auth_user_created los copia a
+  public.usuario. El telefono es OBLIGATORIO en el formulario de
+  registro (el staff lo necesita para contactar al usuario), aunque la
+  columna siga siendo nullable para usuarios creados desde el dashboard.
 - Login: supabase.auth.signInWithPassword({ email, password })
 - Sesion: supabase-js maneja el token y el refresh solo.
 - Para saber si el usuario logueado es empleado (y de que sede), se
@@ -36,7 +39,11 @@ ROW LEVEL SECURITY POR TABLA
 --------------------------------
 usuario:
   - SELECT: auth.uid() = id (cada uno ve/edita solo su propio perfil)
-  - UPDATE: auth.uid() = id
+            OR el que consulta es empleado de la sede donde ese usuario
+               tiene alguna reserva (para que la agenda del staff pueda
+               mostrar nombre y telefono, ver spec 04). Un empleado NO
+               ve usuarios que nunca reservaron en su sede.
+  - UPDATE: auth.uid() = id (solo nombre y telefono)
   - INSERT: solo la via el trigger (no hace falta policy de insert para
     el cliente)
 
@@ -75,13 +82,24 @@ FUNCIONES DE POSTGRES (RPC)
 Todas SECURITY DEFINER (corren con permisos elevados, pero validan
 "a mano" quien puede hacer que):
 
+PARAMETROS DE NEGOCIO: los numeros de las reglas no se repiten como
+literales dentro de cada funcion. Viven como funciones SQL inmutables
+(hora_primer_turno, hora_ultimo_turno, dias_anticipacion_max,
+max_reservas_activas, hora_recargo_desde, factor_recargo,
+monto_sena_default) y el precio se calcula en un unico lugar,
+precio_turno(). Para cambiar una regla se reemplaza la funcion en una
+migracion nueva.
+
 1) disponibilidad(p_cancha_id uuid, p_fecha date)
    returns table(hora_inicio time, ocupado boolean, precio numeric)
-   - Genera los turnos de 1 hora del dia (rango horario a definir con
-     Federico, ej 08:00 a 23:00) y marca cuales ya tienen una reserva
-     activa (estado <> 'cancelada') para esa cancha/fecha.
+   - Genera los turnos de 1 hora del dia, en punto, de 08:00 a 23:00
+     (primer turno 08:00, ultimo 22:00), igual todos los dias.
+   - "ocupado" es true si el turno tiene una reserva activa (estado <>
+     'cancelada') O si ya paso (turnos de hoy mas temprano que la hora
+     actual). Para el que reserva, los dos casos son "no se puede".
    - Calcula el precio de cada turno: precio_base, +10% si
      hora_inicio >= '19:00'.
+   - Rechaza fechas pasadas y fechas a mas de 30 dias.
    - No requiere login (accesible por anon).
 
 2) crear_reserva(p_cancha_id uuid, p_fecha date, p_hora_inicio time)
@@ -90,12 +108,22 @@ Todas SECURITY DEFINER (corren con permisos elevados, pero validan
    - Busca precio_base de la cancha.
    - Calcula precio_total (con recargo si corresponde) y fija
      monto_sena en 15000.
+   - Rechaza: horarios que no sean un turno valido (en punto, 08:00 a
+     22:00), turnos que ya pasaron, fechas a mas de 30 dias y canchas
+     con activa = false.
+   - Tope: un usuario puede tener hasta 3 reservas activas
+     ('pendiente_pago' o 'confirmada') a futuro. Las ya jugadas no
+     cuentan, para que no lo bloqueen para siempre.
+   - Un usuario no puede tener dos reservas activas a la misma fecha y
+     hora (no puede jugar en dos canchas a la vez). En dias distintos
+     si puede repetir horario.
    - Inserta la reserva con usuario_id = auth.uid() y estado inicial
      'pendiente_pago' (ver spec 03 para como se trata ese estado en el
      MVP, antes de tener pagos reales).
-   - Si ya existe una reserva activa para ese turno, el unique index
-     parcial de la tabla lanza un error de Postgres: capturarlo y
-     relanzar un mensaje claro ("Ese turno ya fue reservado").
+   - Los dos casos de choque los garantizan unique indexes parciales de
+     la tabla: capturar el error de Postgres y relanzar un mensaje
+     claro ("Ese turno ya fue reservado" / "Ya tenes una reserva para
+     ese dia y ese horario").
 
 3) validar_llegada(p_reserva_id uuid)
    returns void
@@ -112,6 +140,21 @@ Todas SECURITY DEFINER (corren con permisos elevados, pero validan
    - Al pasar a 'cancelada', el indice unico parcial deja de contar esa
      fila, asi que el turno queda libre automaticamente para una nueva
      reserva.
+
+5) confirmar_reserva(p_reserva_id uuid)
+   returns void
+   - Mismo chequeo de "es empleado de esa sede" que validar_llegada.
+   - Solo acepta reservas en 'pendiente_pago'; las pasa a 'confirmada'.
+   - Es el puente manual mientras no hay Mercado Pago: el usuario
+     transfiere la sena por fuera del sistema, el empleado la verifica
+     y confirma desde el panel (ver spec 03). En la Fase 2 convive con
+     el webhook, que hace lo mismo pero automatico.
+
+6) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
+
+validar_llegada NO cambia el estado de la reserva: solo sella la
+llegada. Los estados 'completada' y 'no_show' estan definidos en el
+modelo pero todavia ninguna funcion los escribe.
 
 EDGE FUNCTIONS (fase 2, Deno/TypeScript en supabase/functions/)
 --------------------------------------------------------------------

@@ -8,7 +8,8 @@ Un usuario es empleado si existe un registro suyo en la tabla
 empleado (usuario_id -> empleado.usuario_id) con activo = true. No
 hace falta un rol especial en Supabase Auth: la unica fuente de verdad
 de "quien es staff" es esa tabla, consultada por las policies de RLS y
-por las funciones (validar_llegada, cancelar_reserva).
+por las funciones (confirmar_reserva, validar_llegada,
+cancelar_reserva).
 
 PERMISOS ACTUALES: SIN JERARQUIA
 ------------------------------------
@@ -26,14 +27,21 @@ FUNCIONALIDADES DEL PANEL DE STAFF
 1. Ver la agenda del dia: todos los turnos de todas las canchas de su
    sede, con los datos del usuario que reservo (nombre, telefono) para
    poder contactarlo si hace falta. Esto es un select directo a la
-   tabla reserva (haciendo join con usuario del lado del cliente o con
-   una vista), permitido por la policy de RLS de reserva para
-   empleados de esa sede.
+   tabla reserva con join a usuario y cancha del lado del cliente:
+     supabase.from('reserva')
+       .select('*, usuario(nombre, telefono), cancha(numero)')
+       .eq('fecha', fecha)
+   Lo permiten la policy de SELECT de reserva (empleados de esa sede)
+   y la de usuario (empleados de una sede donde ese usuario reservo).
 
-2. Marcar que un usuario llego y arranco a jugar:
+2. Confirmar una reserva cuando llego la transferencia de la sena
+   (puente manual hasta la Fase 2, ver spec 03):
+   supabase.rpc('confirmar_reserva', { p_reserva_id }).
+
+3. Marcar que un usuario llego y arranco a jugar:
    supabase.rpc('validar_llegada', { p_reserva_id }).
 
-3. Cancelar una reserva y registrar si la sena fue devuelta o no:
+4. Cancelar una reserva y registrar si la sena fue devuelta o no:
    supabase.rpc('cancelar_reserva', { p_reserva_id, p_sena_devuelta }).
 
 Nada de esto requiere pantallas de configuracion de permisos ni

@@ -67,10 +67,16 @@ Constraints importantes:
   falta logica extra en el frontend).
   Ejemplo: create unique index reserva_turno_unico on reserva
   (cancha_id, fecha, hora_inicio) where estado <> 'cancelada';
+- UNIQUE INDEX parcial en (usuario_id, fecha, hora_inicio) con el mismo
+  criterio: un usuario no puede tener dos reservas activas a la misma
+  fecha y hora (no puede jugar en dos canchas a la vez).
+  create unique index reserva_usuario_horario_unico on reserva
+  (usuario_id, fecha, hora_inicio) where estado <> 'cancelada';
 - Indice en (cancha_id, fecha) para consultas de disponibilidad rapidas.
 - IMPORTANTE (ver spec 02): los roles "authenticated" y "anon" NO tienen
   permiso de INSERT/UPDATE directo sobre esta tabla. Toda escritura pasa
-  por las funciones crear_reserva, validar_llegada y cancelar_reserva.
+  por las funciones crear_reserva, confirmar_reserva, validar_llegada y
+  cancelar_reserva.
 
 TABLA: empleado
 ----------------
