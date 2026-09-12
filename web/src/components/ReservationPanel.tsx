@@ -145,6 +145,7 @@ export function ReservationPanel({
                       type="button"
                       role="radio"
                       aria-checked={elegido}
+                      aria-label={`${horaCorta(t.hora_inicio)}, ${t.ocupado ? 'no disponible' : pesos(t.precio)}`}
                       disabled={t.ocupado}
                       onClick={() => setHora(t.hora_inicio)}
                       className={cn(

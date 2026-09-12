@@ -33,6 +33,7 @@ export function DateStrip({
             type="button"
             role="radio"
             aria-checked={activo}
+            aria-label={`${dia} ${numero}`}
             onClick={() => onCambiar(f)}
             className={cn(
               'flex min-w-[58px] shrink-0 flex-col items-center rounded-[10px] border px-3 py-1.5 transition',
