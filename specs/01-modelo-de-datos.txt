@@ -141,12 +141,18 @@ jugadores del partido (no por equipo).
 
 Total: 20 canchas
 
-  cantidad | numero sugerido | capacidad | precio_base
-  ---------|------------------|-----------|-------------
-  6        | 1 a 6            | 10        | $40.000   (fútbol 5)
-  4        | 7 a 10           | 12        | $52.000   (fútbol 6)
-  6        | 11 a 16          | 14        | $60.000   (fútbol 7)
-  4        | 17 a 20          | 16        | $72.000   (fútbol 8)
+  cantidad | numeros reales        | capacidad | precio_base
+  ---------|-----------------------|-----------|-------------
+  6        | 7, 8, 9, 10, 11 y 20  | 10        | $40.000   (fútbol 5)
+  4        | 12 a 15               | 12        | $52.000   (fútbol 6)
+  6        | 1 a 6                 | 14        | $60.000   (fútbol 7)
+  4        | 16 a 19               | 16        | $72.000   (fútbol 8)
+
+Ojo: la numeracion del seed original de este spec era inventada
+(agrupaba los numeros por modalidad en bloques ordenados). La de arriba
+es la real del predio, la misma que usan los bocetos, y quedo corregida
+en la migracion numeracion_real_de_canchas. Los numeros NO son
+correlativos por modalidad: la cancha 20 es de futbol 5, no de futbol 8.
 
 Nota: la "modalidad" (fútbol 5/6/7/8) hoy se puede derivar de la
 capacidad uno a uno (10→5, 12→6, 14→7, 16→8), así que no hace falta
