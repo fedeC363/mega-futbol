@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { modalidad, type CanchaMapa } from '../lib/canchas';
 import { cn } from '../lib/cn';
+import { ALIAS_TRANSFERENCIA, WHATSAPP_NUMERO, whatsappUrl } from '../lib/contacto';
 import { horaEntera, porcentajeRecargo, type Parametros } from '../lib/datos';
 import { mensajeDeError } from '../lib/errores';
 import { fechaLegible, horaCorta, rangoTurno } from '../lib/fechas';
@@ -235,9 +236,19 @@ function ReservaCreada({
 
       <div className="mt-4">
         <Aviso tipo="info">
-          Para confirmar el turno, transferí la seña de {pesos(reserva.monto_sena)} y avisale al predio. Cuando un
-          empleado la verifica, la reserva pasa a <b>confirmada</b>.
-          <span className="mt-2 block text-cream-dim italic">Datos para transferir: a definir.</span>
+          Para confirmar el turno, transferí la seña de {pesos(reserva.monto_sena)} al alias{' '}
+          <b className="font-semibold">{ALIAS_TRANSFERENCIA}</b> y avisale al predio. Cuando un empleado la verifica, la
+          reserva pasa a <b>confirmada</b>.
+          {WHATSAPP_NUMERO && (
+            <a
+              href={whatsappUrl(WHATSAPP_NUMERO)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2.5 block font-semibold text-orange"
+            >
+              Avisar por WhatsApp →
+            </a>
+          )}
         </Aviso>
       </div>
 
