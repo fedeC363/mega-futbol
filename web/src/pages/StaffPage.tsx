@@ -8,7 +8,7 @@ import { tipoDeCancha } from '../lib/canchas';
 import { cn } from '../lib/cn';
 import { mensajeDeError } from '../lib/errores';
 import { estadoDe } from '../lib/estados';
-import { fechaLegible, horaCorta, horaDeTimestamp, hoyBA, sumarDias } from '../lib/fechas';
+import { conMayuscula, fechaLegible, horaCorta, horaDeTimestamp, hoyBA, sumarDias } from '../lib/fechas';
 import { pesos } from '../lib/formato';
 import { supabase } from '../lib/supabase';
 
@@ -88,7 +88,7 @@ export function StaffPage() {
   return (
     <Pagina
       titulo="Agenda del día"
-      subtitulo={<span className="first-letter:uppercase">{fechaLegible(fecha)}</span>}
+      subtitulo={conMayuscula(fechaLegible(fecha))}
       ancho="max-w-3xl"
       acciones={
         <div className="flex items-center gap-1.5">

@@ -45,6 +45,15 @@ export function fechaLegible(iso: string): string {
   return fmtLarga.format(aFecha(iso));
 }
 
+/**
+ * Primera letra en mayuscula. Hace falta porque la clase de CSS
+ * `first-letter:uppercase` solo surte efecto en elementos de bloque, y
+ * estos textos suelen ir dentro de un span.
+ */
+export function conMayuscula(texto: string): string {
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
 /** '20:00:00' -> '20:00' */
 export function horaCorta(hora: string): string {
   return hora.slice(0, 5);
