@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { Cancha, Sede } from './tipos';
+import type { Cancha, Sede, Turno } from './tipos';
 
 /**
  * Parametros de negocio leidos de la base (funciones de la migracion
@@ -65,6 +65,28 @@ export async function cargarCanchas(sedeId: string): Promise<Cancha[]> {
     .eq('sede_id', sedeId)
     .eq('activa', true)
     .order('numero');
+  if (error) throw error;
+  return data;
+}
+
+export async function cargarCancha(id: string): Promise<Cancha> {
+  const { data, error } = await supabase
+    .from('cancha')
+    .select('*')
+    .eq('id', id)
+    .eq('activa', true)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('Esa cancha no existe o no está disponible.');
+  return data;
+}
+
+/** Turnos del dia para una cancha, con su precio ya calculado por la base. */
+export async function cargarDisponibilidad(canchaId: string, fecha: string): Promise<Turno[]> {
+  const { data, error } = await supabase.rpc('disponibilidad', {
+    p_cancha_id: canchaId,
+    p_fecha: fecha,
+  });
   if (error) throw error;
   return data;
 }

@@ -1,16 +1,15 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
-import type { ReservaPendiente } from '../components/ReservationPanel';
 import { Pagina } from '../components/Pagina';
 import { Aviso, Boton, Campo } from '../components/ui';
 import { cn } from '../lib/cn';
 import { mensajeDeErrorAuth } from '../lib/errores';
 import { supabase } from '../lib/supabase';
 
+/** A donde volver despues de ingresar; lo manda la pagina que trajo acá. */
 interface EstadoVuelta {
   volverA?: string;
-  reserva?: ReservaPendiente;
 }
 
 /**
@@ -22,18 +21,17 @@ export function IngresarPage() {
   const { session, cargando } = useAuth();
   const navigate = useNavigate();
   const vuelta = (useLocation().state as EstadoVuelta | null) ?? {};
+  const volverA = vuelta.volverA;
   const [modo, setModo] = useState<'ingresar' | 'registro'>('ingresar');
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mailEnviadoA, setMailEnviadoA] = useState<string | null>(null);
 
   if (!cargando && session && !enviando) {
-    return <Navigate to={vuelta.volverA ?? '/perfil'} replace state={vuelta.reserva ? { reserva: vuelta.reserva } : null} />;
+    return <Navigate to={volverA ?? '/perfil'} replace />;
   }
 
-  function continuar() {
-    navigate(vuelta.volverA ?? '/', { replace: true, state: vuelta.reserva ? { reserva: vuelta.reserva } : null });
-  }
+  const continuar = () => navigate(volverA ?? '/', { replace: true });
 
   async function enviar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -96,7 +94,9 @@ export function IngresarPage() {
   return (
     <Pagina
       titulo={modo === 'ingresar' ? 'Ingresá' : 'Creá tu cuenta'}
-      subtitulo={vuelta.reserva ? 'Necesitás una cuenta para reservar. Tu turno te espera.' : undefined}
+      subtitulo={
+        volverA?.startsWith('/cancha') ? 'Necesitás una cuenta para reservar. No perdés el turno elegido.' : undefined
+      }
       ancho="max-w-md"
     >
       <div role="tablist" className="mb-5 grid grid-cols-2 gap-1 rounded-xl border border-cream/10 bg-panel p-1">

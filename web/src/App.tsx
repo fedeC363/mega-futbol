@@ -5,6 +5,7 @@ import { ContactoPage } from './pages/ContactoPage';
 import { IngresarPage } from './pages/IngresarPage';
 import { MapaPage } from './pages/MapaPage';
 import { PerfilPage } from './pages/PerfilPage';
+import { ReservaPage } from './pages/ReservaPage';
 import { StaffPage } from './pages/StaffPage';
 
 export function App() {
@@ -14,6 +15,7 @@ export function App() {
         <Routes>
           <Route element={<AppShell />}>
             <Route index element={<MapaPage />} />
+            <Route path="cancha/:canchaId" element={<ReservaPage />} />
             <Route path="ingresar" element={<IngresarPage />} />
             <Route path="perfil" element={<PerfilPage />} />
             <Route path="contacto" element={<ContactoPage />} />
