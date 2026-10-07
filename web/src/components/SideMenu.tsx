@@ -18,7 +18,7 @@ interface Item {
  *  - desktop: rail fijo a la izquierda, colapsado muestra solo iconos.
  */
 export function SideMenu() {
-  const { empleado } = useAuth();
+  const { empleado, esAdmin } = useAuth();
   const [railAbierto, setRailAbierto] = useState(false);
   const [fabAbierto, setFabAbierto] = useState(false);
   const { pathname } = useLocation();
@@ -33,6 +33,8 @@ export function SideMenu() {
     { icono: '💬', etiqueta: 'Contacto y redes', to: '/contacto' },
     // Solo para quien tiene una fila activa en empleado.
     ...(empleado ? [{ icono: '🗂️', etiqueta: 'Panel de staff', to: '/staff' }] : []),
+    // Precios y configuracion: solo rol admin.
+    ...(esAdmin ? [{ icono: '⚙️', etiqueta: 'Panel de admin', to: '/admin' }] : []),
   ];
 
   return (
