@@ -1,0 +1,16 @@
+{
+  "name": "mega-futbol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Atajos para correr el proyecto desde la raíz. El frontend vive en /web y la base en /supabase.",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "typecheck": "npm --prefix web run typecheck",
+    "preview": "npm --prefix web run preview",
+    "setup": "npm --prefix web install",
+    "db:push": "npx -y supabase@latest db push",
+    "db:list": "npx -y supabase@latest migration list",
+    "db:types": "npm --prefix web run gen:types"
+  }
+}

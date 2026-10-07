@@ -94,8 +94,18 @@ npx supabase migration list                          # repo vs. nube
 Una migración ya aplicada con `db push` no se edita: se corrige con una
 migración nueva. No usar `db reset` (en la nube borraría datos reales).
 
+Desde la raíz del proyecto, con los atajos del `package.json` de la raíz
+(delegan a `/web`; no hace falta `cd`, que en PowerShell además no se
+puede encadenar con `&&`):
+
 ```
-cd web && npm install
-cp ../.env.example .env       # completar VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY
-npm run dev                   # frontend
+npm run setup                 # una vez: instala las dependencias de /web
+npm run dev                   # frontend en http://localhost:5173
+npm run typecheck
+npm run build
+npm run db:push               # aplica migraciones a Supabase
+npm run db:list               # compara migraciones del repo con la nube
 ```
+
+El frontend necesita `web/.env` con `VITE_SUPABASE_URL` y
+`VITE_SUPABASE_ANON_KEY` (ver `.env.example`).
