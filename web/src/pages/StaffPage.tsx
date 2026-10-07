@@ -6,31 +6,47 @@ import { Aviso, Boton, Cargando, Insignia } from '../components/ui';
 import { useCargado } from '../hooks/useCargado';
 import { tipoDeCancha } from '../lib/canchas';
 import { cn } from '../lib/cn';
+import { cargarParametros } from '../lib/datos';
 import { mensajeDeError } from '../lib/errores';
 import { estadoDe } from '../lib/estados';
 import { conMayuscula, fechaLegible, horaCorta, horaDeTimestamp, hoyBA, sumarDias } from '../lib/fechas';
 import { pesos } from '../lib/formato';
+import { CLASES_SANCION, sancionDe } from '../lib/sanciones';
 import { supabase } from '../lib/supabase';
+
+/** Filtros de la agenda. 'todos' no filtra nada. */
+const FILTROS = [
+  { clave: 'todos', etiqueta: 'Todos' },
+  { clave: 'pendiente_pago', etiqueta: 'Pendientes' },
+  { clave: 'confirmada', etiqueta: 'Confirmados' },
+  { clave: 'cancelada', etiqueta: 'Cancelados' },
+  { clave: 'no_show', etiqueta: 'No se presentó' },
+] as const;
+
+type Filtro = (typeof FILTROS)[number]['clave'];
 
 /**
  * Panel de staff (spec 04). Sin boceto todavia.
- * Agenda del dia de la sede + confirmar seña, validar llegada y cancelar.
- * Los permisos los chequea la base (RLS + funciones), no esta pantalla:
- * ocultarla a quien no es empleado es solo por prolijidad.
+ * Agenda del dia de la sede + confirmar seña, validar llegada, marcar
+ * inasistencia y cancelar. Los permisos los chequea la base (RLS +
+ * funciones), no esta pantalla.
  */
 export function StaffPage() {
   const { session, empleado, cargando } = useAuth();
   const [fecha, setFecha] = useState(hoyBA());
+  const [filtro, setFiltro] = useState<Filtro>('todos');
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
   const [errores, setErrores] = useState<Record<string, string>>({});
+
+  const parametros = useCargado(cargarParametros, []);
 
   const agenda = useCargado(async () => {
     if (!empleado) return [];
     const { data, error } = await supabase
       .from('reserva')
       .select(
-        'id, hora_inicio, estado, precio_total, monto_sena, sena_devuelta, llegada_validada_at, cancha:cancha_id(numero, capacidad), usuario:usuario_id(nombre, telefono)',
+        'id, hora_inicio, estado, precio_total, monto_sena, sena_devuelta, llegada_validada_at, no_show_at, cancha:cancha_id(numero, capacidad), usuario:usuario_id(nombre, telefono, inasistencias, suspendido_hasta, vetado)',
       )
       .eq('fecha', fecha)
       .order('hora_inicio');
@@ -82,8 +98,9 @@ export function StaffPage() {
     { etiqueta: 'Turnos', valor: activas.length },
     { etiqueta: 'Pendientes de seña', valor: activas.filter((r) => r.estado === 'pendiente_pago').length },
     { etiqueta: 'Confirmadas', valor: activas.filter((r) => r.estado === 'confirmada').length },
-    { etiqueta: 'Llegaron', valor: activas.filter((r) => r.llegada_validada_at).length },
+    { etiqueta: 'No se presentaron', valor: filas.filter((r) => r.estado === 'no_show').length },
   ];
+  const visibles = filtro === 'todos' ? filas : filas.filter((r) => r.estado === filtro);
 
   return (
     <Pagina
@@ -122,23 +139,48 @@ export function StaffPage() {
         ))}
       </div>
 
+      <div role="radiogroup" aria-label="Filtrar por estado" className="mb-4 flex flex-wrap gap-2">
+        {FILTROS.map((f) => {
+          const cantidad = f.clave === 'todos' ? filas.length : filas.filter((r) => r.estado === f.clave).length;
+          const activo = filtro === f.clave;
+          return (
+            <button
+              key={f.clave}
+              type="button"
+              role="radio"
+              aria-checked={activo}
+              onClick={() => setFiltro(f.clave)}
+              className={cn(
+                'rounded-full border px-3.5 py-1.5 text-[13px] transition',
+                activo
+                  ? 'border-orange bg-orange font-semibold text-ink'
+                  : 'border-cream/12 bg-panel text-cream-dim hover:text-cream',
+              )}
+            >
+              {f.etiqueta} <span className={activo ? 'text-ink/70' : 'text-cream-dim'}>{cantidad}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {agenda.error && <Aviso>{agenda.error}</Aviso>}
       {agenda.cargando && !agenda.data && <Cargando texto="Cargando la agenda…" />}
-      {agenda.data && filas.length === 0 && (
+      {agenda.data && visibles.length === 0 && (
         <p className="rounded-xl border border-cream/10 bg-panel px-5 py-8 text-center text-[14px] text-cream-dim">
-          No hay reservas para este día.
+          {filas.length === 0 ? 'No hay reservas para este día.' : 'Ninguna reserva de este día tiene ese estado.'}
         </p>
       )}
 
       <ul className="grid gap-2.5">
-        {filas.map((r) => {
+        {visibles.map((r) => {
           const estado = estadoDe(r.estado);
-          const cancelada = r.estado === 'cancelada';
+          const cerrada = r.estado === 'cancelada' || r.estado === 'no_show';
           const ocupado = ocupadoId === r.id;
+          const sancion = r.usuario ? sancionDe(r.usuario, parametros.data) : null;
           return (
             <li
               key={r.id}
-              className={cn('rounded-xl border border-cream/10 bg-panel px-4 py-3.5', cancelada && 'opacity-55')}
+              className={cn('rounded-xl border border-cream/10 bg-panel px-4 py-3.5', cerrada && 'opacity-60')}
             >
               <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
                 <p className="font-display text-[28px] leading-none font-bold text-orange">{horaCorta(r.hora_inicio)}</p>
@@ -157,6 +199,11 @@ export function StaffPage() {
                       </>
                     )}
                   </p>
+                  {sancion && (
+                    <p className="mt-1.5">
+                      <Insignia clases={CLASES_SANCION[sancion.tipo]}>⚠ {sancion.etiqueta}</Insignia>
+                    </p>
+                  )}
                 </div>
                 <Insignia clases={estado.clases}>{estado.etiqueta}</Insignia>
               </div>
@@ -164,7 +211,8 @@ export function StaffPage() {
               <p className="mt-2 text-[12px] text-cream-dim">
                 Turno {pesos(r.precio_total)} · seña {pesos(r.monto_sena)} · resto {pesos(r.precio_total - r.monto_sena)}
                 {r.llegada_validada_at && <> · llegó {horaDeTimestamp(r.llegada_validada_at)}</>}
-                {cancelada && <> · seña {r.sena_devuelta ? 'devuelta' : 'no devuelta'}</>}
+                {r.no_show_at && <> · inasistencia marcada {horaDeTimestamp(r.no_show_at)}</>}
+                {r.estado === 'cancelada' && <> · seña {r.sena_devuelta ? 'devuelta' : 'no devuelta'}</>}
               </p>
 
               {errores[r.id] && (
@@ -173,7 +221,7 @@ export function StaffPage() {
                 </div>
               )}
 
-              {!cancelada && cancelandoId !== r.id && (
+              {!cerrada && cancelandoId !== r.id && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {r.estado === 'pendiente_pago' && (
                     <Boton
@@ -185,14 +233,24 @@ export function StaffPage() {
                     </Boton>
                   )}
                   {!r.llegada_validada_at && (
-                    <Boton
-                      variante="secundaria"
-                      className="px-3.5 py-2 text-[13px]"
-                      disabled={ocupado}
-                      onClick={() => ejecutar(r.id, () => supabase.rpc('validar_llegada', { p_reserva_id: r.id }))}
-                    >
-                      Validar llegada
-                    </Boton>
+                    <>
+                      <Boton
+                        variante="secundaria"
+                        className="px-3.5 py-2 text-[13px]"
+                        disabled={ocupado}
+                        onClick={() => ejecutar(r.id, () => supabase.rpc('validar_llegada', { p_reserva_id: r.id }))}
+                      >
+                        Validar llegada
+                      </Boton>
+                      <Boton
+                        variante="secundaria"
+                        className="px-3.5 py-2 text-[13px]"
+                        disabled={ocupado}
+                        onClick={() => ejecutar(r.id, () => supabase.rpc('marcar_inasistencia', { p_reserva_id: r.id }))}
+                      >
+                        No se presentó
+                      </Boton>
+                    </>
                   )}
                   <Boton
                     variante="fantasma"

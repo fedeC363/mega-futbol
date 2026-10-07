@@ -4,7 +4,9 @@ import { Pagina } from '../components/Pagina';
 import { Aviso, Boton, Cargando, Insignia } from '../components/ui';
 import { useCargado } from '../hooks/useCargado';
 import { modalidad, tipoDeCancha } from '../lib/canchas';
+import { cargarParametros } from '../lib/datos';
 import { estadoDe } from '../lib/estados';
+import { sancionDe } from '../lib/sanciones';
 import { fechaLegible, hoyBA, horaActualBA, rangoTurno } from '../lib/fechas';
 import { pesos } from '../lib/formato';
 import { supabase } from '../lib/supabase';
@@ -13,6 +15,7 @@ import { supabase } from '../lib/supabase';
 export function PerfilPage() {
   const { session, perfil, cargando, salir } = useAuth();
   const userId = session?.user.id;
+  const parametros = useCargado(cargarParametros, []);
 
   const reservas = useCargado(async () => {
     if (!userId) return [];
@@ -51,6 +54,10 @@ export function PerfilPage() {
     );
   }
 
+  // Aviso de amonestaciones (spec 04): quien decide si puede reservar
+  // es crear_reserva en la base, esto solo lo pone sobre aviso.
+  const sancion = perfil ? sancionDe(perfil, parametros.data) : null;
+
   // Solo para agrupar en pantalla; no decide nada de negocio.
   const hoy = hoyBA();
   const horaAhora = horaActualBA();
@@ -75,6 +82,14 @@ export function PerfilPage() {
         </Boton>
       }
     >
+      {sancion && (
+        <div className="mb-5">
+          <Aviso>
+            <b>{sancion.etiqueta}.</b> {sancion.mensaje}
+          </Aviso>
+        </div>
+      )}
+
       {reservas.error && <Aviso>{reservas.error}</Aviso>}
       {reservas.cargando && !reservas.data && <Cargando texto="Cargando tus reservas…" />}
 
