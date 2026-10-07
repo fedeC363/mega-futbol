@@ -11,16 +11,21 @@ de "quien es staff" es esa tabla, consultada por las policies de RLS y
 por las funciones (confirmar_reserva, validar_llegada,
 cancelar_reserva).
 
-PERMISOS ACTUALES: SIN JERARQUIA
+PERMISOS: DOS ROLES
 ------------------------------------
-Hoy TODOS los empleados pueden hacer TODO lo del panel de staff. No
-hay un rol de "encargado" con mas permisos que otro empleado.
+El campo empleado.rol define dos niveles, y ahora SI se lee para
+decidir permisos (antes no existia la distincion):
 
-La tabla empleado tiene un campo "rol" (default 'staff') para no tener
-que migrar el esquema el dia de manana si Federico decide diferenciar
-permisos. Mientras tanto, ni las policies de RLS ni las funciones RPC
-deben leer ese campo para decidir nada: cualquier fila activa en
-empleado alcanza para tener acceso completo al panel de staff.
+- 'staff' (default): todo el trabajo diario del panel. Cualquier fila
+  activa en empleado alcanza. Entre empleados staff no hay jerarquia.
+- 'admin': lo mismo que staff, mas lo que toca plata y configuracion:
+  precio de las canchas, dar de baja una cancha, parametros globales y
+  levantar sanciones.
+
+El chequeo de admin vive en una sola funcion, es_admin(), igual que
+es_empleado_de_sede() para el staff. Las funciones de admin lo
+verifican por dentro: ocultar el panel en el frontend es prolijidad,
+no seguridad.
 
 FUNCIONALIDADES DEL PANEL DE STAFF
 ---------------------------------------
@@ -43,6 +48,50 @@ FUNCIONALIDADES DEL PANEL DE STAFF
 
 4. Cancelar una reserva y registrar si la sena fue devuelta o no:
    supabase.rpc('cancelar_reserva', { p_reserva_id, p_sena_devuelta }).
+
+5. Marcar que el usuario no se presento a jugar:
+   supabase.rpc('marcar_inasistencia', { p_reserva_id }).
+   Va al lado de "validar llegada": una reserva termina en una cosa o
+   en la otra. Dispara el sistema de amonestaciones de abajo.
+
+La agenda se puede filtrar por estado (todos, pendientes de seña,
+confirmados, cancelados, no se presento). El filtro es de pantalla: la
+consulta trae el dia completo.
+
+AMONESTACIONES POR INASISTENCIA
+-----------------------------------
+Un usuario que reserva, transfiere la seña y no aparece deja la cancha
+sin usar y sin cobrar el resto. Por eso:
+
+- Cada usuario tiene un contador de inasistencias del ciclo actual.
+- Al llegar a 2 (configurable): se le avisa en su perfil, y el staff ve
+  la marca al lado de su nombre en la agenda.
+- Al llegar a 5 (configurable): suspension automatica de 2 meses. No
+  puede crear reservas nuevas; crear_reserva lo rechaza con la fecha
+  hasta la que dura. Las reservas que ya tenia a futuro NO se cancelan:
+  si hay que darlas de baja, lo hace un empleado a mano.
+- Al aplicarse la suspension el contador vuelve a 0: el ciclo siguiente
+  arranca limpio. Como no puede reservar mientras dure, tampoco puede
+  sumar inasistencias nuevas en el medio.
+- Si despues de cumplir una suspension vuelve a juntar 5: veto
+  permanente.
+- Un admin puede levantar cualquier sancion con levantar_sancion, que
+  deja la cuenta como nueva. No hay pantalla todavia: se invoca la
+  funcion.
+
+Los umbrales (2, 5) y la duracion (2 meses) viven en la tabla
+configuracion, no hardcodeados.
+
+PANEL DE ADMIN (solo rol admin)
+-----------------------------------
+1. Cambiar el precio_base de cada cancha y darla de alta o de baja
+   (actualizar_cancha).
+2. Cambiar los parametros globales: horario del primer y del ultimo
+   turno, hora y porcentaje del recargo, monto de la seña, tope de
+   reservas activas y dias de anticipacion (actualizar_configuracion).
+
+Cambiar un precio no afecta a las reservas ya hechas: cada una congela
+su precio_total al crearse (spec 01).
 
 Nada de esto requiere pantallas de configuracion de permisos ni
 gestion de usuarios empleados desde la propia app: por ahora, dar de

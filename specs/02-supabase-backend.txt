@@ -47,10 +47,13 @@ usuario:
   - INSERT: solo la via el trigger (no hace falta policy de insert para
     el cliente)
 
-sede, cancha:
+sede, cancha, configuracion:
   - SELECT: true para todos (incluido anon) -- navegacion publica
-  - INSERT/UPDATE/DELETE: sin policy para anon/authenticated (se
-    administran por migracion o desde el dashboard, no desde la app)
+  - INSERT/UPDATE/DELETE: sin policy para anon/authenticated y sin
+    privilegios de escritura. sede se administra por migracion; el
+    precio y el alta/baja de una cancha se cambian con
+    actualizar_cancha, y los parametros globales con
+    actualizar_configuracion, las dos solo para rol admin.
 
 reserva:
   - SELECT: auth.uid() = usuario_id
@@ -83,12 +86,16 @@ Todas SECURITY DEFINER (corren con permisos elevados, pero validan
 "a mano" quien puede hacer que):
 
 PARAMETROS DE NEGOCIO: los numeros de las reglas no se repiten como
-literales dentro de cada funcion. Viven como funciones SQL inmutables
-(hora_primer_turno, hora_ultimo_turno, dias_anticipacion_max,
-max_reservas_activas, hora_recargo_desde, factor_recargo,
-monto_sena_default) y el precio se calcula en un unico lugar,
-precio_turno(). Para cambiar una regla se reemplaza la funcion en una
-migracion nueva.
+literales dentro de cada funcion. Viven en la tabla configuracion (una
+sola fila, ver spec 01) y se leen con funciones que conservan el mismo
+nombre y la misma firma de siempre: hora_primer_turno,
+hora_ultimo_turno, dias_anticipacion_max, max_reservas_activas,
+hora_recargo_desde, factor_recargo, monto_sena_default. El precio se
+calcula en un unico lugar, precio_turno().
+
+Los edita el admin desde el panel, via actualizar_configuracion. Como
+ahora dependen de una tabla, esas funciones son STABLE y ya no
+IMMUTABLE.
 
 1) disponibilidad(p_cancha_id uuid, p_fecha date)
    returns table(hora_inicio time, ocupado boolean, precio numeric)
@@ -108,6 +115,9 @@ migracion nueva.
    - Busca precio_base de la cancha.
    - Calcula precio_total (con recargo si corresponde) y fija
      monto_sena en 15000.
+   - Rechaza si el usuario esta vetado, o suspendido por inasistencias
+     (mensaje con la fecha hasta la que dura). Se valida ACA, no en el
+     frontend, porque es la unica via de escritura sobre reserva.
    - Rechaza: horarios que no sean un turno valido (en punto, 08:00 a
      22:00), turnos que ya pasaron, fechas a mas de 30 dias y canchas
      con activa = false.
@@ -150,7 +160,43 @@ migracion nueva.
      y confirma desde el panel (ver spec 03). En la Fase 2 convive con
      el webhook, que hace lo mismo pero automatico.
 
-6) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
+6) marcar_inasistencia(p_reserva_id uuid)
+   returns void
+   - Mismo chequeo de "es empleado de esa sede": cualquier empleado
+     puede marcarla, no hace falta ser admin.
+   - Rechaza si la reserva esta cancelada, si ya estaba marcada, si
+     tiene la llegada validada (el usuario si se presento) o si el
+     turno todavia no empezo.
+   - Pasa la reserva a 'no_show' y guarda no_show_at / no_show_por.
+   - Suma 1 al contador del usuario y, si llego al umbral, aplica la
+     sancion que corresponda (ver spec 04).
+
+7) levantar_sancion(p_usuario_id uuid)   -- SOLO ADMIN
+   returns void
+   - Deja la cuenta como nueva: contador en 0, sin suspension, sin
+     veto, y olvida las suspensiones cumplidas. Para revertir un error
+     del staff o resolver un reclamo.
+
+8) actualizar_configuracion(...)   -- SOLO ADMIN
+   returns configuracion
+   - Cambia los parametros globales. Los argumentos en NULL dejan el
+     valor que ya estaba. Los checks de la tabla impiden guardar una
+     combinacion invalida.
+
+9) actualizar_cancha(p_cancha_id, p_precio_base, p_activa)  -- SOLO ADMIN
+   returns cancha
+   - Cambia el precio base y/o da de alta o de baja una cancha. No
+     toca las reservas ya hechas: su precio quedo congelado. Dar de
+     baja tampoco cancela sus reservas futuras, solo impide tomar
+     turnos nuevos.
+
+10) es_admin()
+    returns boolean
+    - SECURITY DEFINER. El chequeo de rol admin en un solo lugar, igual
+      que es_empleado_de_sede para el staff.
+
+11) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
+    Devuelve empleado_id, sede_id y rol.
 
 validar_llegada NO cambia el estado de la reserva: solo sella la
 llegada. Los estados 'completada' y 'no_show' estan definidos en el

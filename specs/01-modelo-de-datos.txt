@@ -9,10 +9,14 @@ cosa.
 
 TABLA: usuario  (extiende a auth.users, no la reemplaza)
 -----------------------------------------------------------
-- id             uuid, PK, references auth.users(id) on delete cascade
-- nombre         text, not null
-- telefono       text, nullable
-- created_at     timestamptz, default now()
+- id                uuid, PK, references auth.users(id) on delete cascade
+- nombre            text, not null
+- telefono          text, nullable
+- created_at        timestamptz, default now()
+- inasistencias     int, not null, default 0    -- del ciclo actual
+- suspensiones      int, not null, default 0    -- cuantas cumplio
+- suspendido_hasta  timestamptz, nullable       -- no puede reservar hasta aca
+- vetado            boolean, not null, default false  -- veto permanente
 
 Notas:
 - El email y la contrasena los maneja Supabase Auth (auth.users), NO se
@@ -56,6 +60,8 @@ TABLA: reserva
 - llegada_validada_por  uuid, FK -> empleado.id, nullable
 - cancelada_at          timestamptz, nullable
 - cancelada_por         uuid, FK -> empleado.id, nullable
+- no_show_at            timestamptz, nullable    -- cuando se marco la inasistencia
+- no_show_por           uuid, FK -> empleado.id, nullable
 - sena_devuelta         boolean, default false   -- registro manual de que el staff devolvio la sena
 - created_at            timestamptz, default now()
 
@@ -85,6 +91,35 @@ TABLA: empleado
 - sede_id       uuid, FK -> sede.id, not null
 - rol           text, default 'staff'   -- hoy sin diferenciacion de permisos, dejar preparado
 - activo        boolean, default true
+
+TABLA: configuracion  (fila unica)
+----------------------------------------
+Los parametros del negocio: antes eran funciones SQL fijas y cambiarlos
+era escribir una migracion. Ahora son datos, porque el panel de admin
+los edita.
+
+- id                        boolean, PK, default true, check (id)
+                              -- garantiza una sola fila
+- hora_primer_turno         time, not null, default '08:00'
+- hora_ultimo_turno         time, not null, default '22:00'
+- hora_recargo_desde        time, not null, default '19:00'
+- factor_recargo            numeric(4,2), not null, default 1.10
+- monto_sena                numeric(10,2), not null, default 15000
+- max_reservas_activas      int, not null, default 3
+- dias_anticipacion_max     int, not null, default 30
+- inasistencias_aviso       int, not null, default 2
+- inasistencias_suspension  int, not null, default 5
+- meses_suspension          int, not null, default 2
+- actualizado_at            timestamptz, not null, default now()
+- actualizado_por           uuid, FK -> empleado.id, nullable
+
+Tiene checks que impiden dejarla en un estado absurdo (primer turno
+antes del ultimo, recargo >= 1, seña > 0, umbral de suspension mayor al
+de aviso, etc.).
+
+Las funciones hora_primer_turno(), monto_sena_default() y companía
+siguen existiendo con el mismo nombre y la misma firma: ahora leen esta
+tabla. Por eso dejaron de ser IMMUTABLE y pasaron a STABLE.
 
 TABLA: pago  (FASE 2 - no se implementa en el MVP, pero dejar modelada)
 -------------------------------------------------------------------------
