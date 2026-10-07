@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { Cancha, Sede, Turno } from './tipos';
+import type { Cancha, Configuracion, Sede, Turno } from './tipos';
 
 /**
  * Parametros de negocio leidos de la base (funciones de la migracion
@@ -12,18 +12,30 @@ export interface Parametros {
   sena: number;
   recargoDesde: string;
   factorRecargo: number;
+  maxReservasActivas: number;
+  diasAnticipacionMax: number;
+  inasistenciasAviso: number;
+  inasistenciasSuspension: number;
 }
 
-/** Cachea una carga que no cambia durante la sesion; si falla, se reintenta. */
-function unaVez<T>(cargar: () => Promise<T>): () => Promise<T> {
+/**
+ * Cachea una carga que casi no cambia durante la sesion; si falla, se
+ * reintenta. `invalidar()` suelta la cache: lo usa el panel de admin
+ * despues de guardar la configuracion.
+ */
+function unaVez<T>(cargar: () => Promise<T>) {
   let promesa: Promise<T> | null = null;
-  return () => {
+  const leer = () => {
     promesa ??= cargar().catch((error: unknown) => {
       promesa = null;
       throw error;
     });
     return promesa;
   };
+  leer.invalidar = () => {
+    promesa = null;
+  };
+  return leer;
 }
 
 // Hoy existe una sola sede (spec 04). Cuando haya mas, se elige en la UI.
@@ -38,33 +50,33 @@ export const cargarSede = unaVez(async (): Promise<Sede> => {
   return data;
 });
 
+/** La fila unica de configuracion, tal cual esta en la base. */
+export async function cargarConfiguracion(): Promise<Configuracion> {
+  const { data, error } = await supabase.from('configuracion').select('*').limit(1).single();
+  if (error) throw error;
+  return data;
+}
+
 export const cargarParametros = unaVez(async (): Promise<Parametros> => {
-  const [primer, ultimo, sena, recargo, factor] = await Promise.all([
-    supabase.rpc('hora_primer_turno'),
-    supabase.rpc('hora_ultimo_turno'),
-    supabase.rpc('monto_sena_default'),
-    supabase.rpc('hora_recargo_desde'),
-    supabase.rpc('factor_recargo'),
-  ]);
-  for (const r of [primer, ultimo, sena, recargo, factor]) {
-    if (r.error) throw r.error;
-  }
+  const c = await cargarConfiguracion();
   return {
-    primerTurno: primer.data!,
-    ultimoTurno: ultimo.data!,
-    sena: sena.data!,
-    recargoDesde: recargo.data!,
-    factorRecargo: factor.data!,
+    primerTurno: c.hora_primer_turno,
+    ultimoTurno: c.hora_ultimo_turno,
+    sena: c.monto_sena,
+    recargoDesde: c.hora_recargo_desde,
+    factorRecargo: c.factor_recargo,
+    maxReservasActivas: c.max_reservas_activas,
+    diasAnticipacionMax: c.dias_anticipacion_max,
+    inasistenciasAviso: c.inasistencias_aviso,
+    inasistenciasSuspension: c.inasistencias_suspension,
   };
 });
 
-export async function cargarCanchas(sedeId: string): Promise<Cancha[]> {
-  const { data, error } = await supabase
-    .from('cancha')
-    .select('*')
-    .eq('sede_id', sedeId)
-    .eq('activa', true)
-    .order('numero');
+/** `soloActivas` en false trae tambien las dadas de baja (panel de admin). */
+export async function cargarCanchas(sedeId: string, soloActivas = true): Promise<Cancha[]> {
+  let consulta = supabase.from('cancha').select('*').eq('sede_id', sedeId);
+  if (soloActivas) consulta = consulta.eq('activa', true);
+  const { data, error } = await consulta.order('numero');
   if (error) throw error;
   return data;
 }

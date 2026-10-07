@@ -65,6 +65,13 @@ export function rangoTurno(hora: string): string {
   return `${horaCorta(hora)} – ${fin}:00`;
 }
 
+/** Timestamp de Postgres -> '07/12/2026' en Buenos Aires. */
+export function fechaDeTimestamp(ts: string): string {
+  return new Intl.DateTimeFormat('es-AR', { timeZone: ZONA, day: '2-digit', month: '2-digit', year: 'numeric' }).format(
+    new Date(ts),
+  );
+}
+
 /** Timestamp de Postgres -> 'HH:MM' en Buenos Aires. */
 export function horaDeTimestamp(ts: string): string {
   return fmtHoraMinuto.format(new Date(ts));

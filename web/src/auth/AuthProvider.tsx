@@ -6,6 +6,8 @@ import type { Usuario } from '../lib/tipos';
 export interface Empleado {
   empleado_id: string;
   sede_id: string;
+  /** 'staff' o 'admin'. Solo admin toca precios y configuracion. */
+  rol: string;
 }
 
 interface AuthContexto {
@@ -13,6 +15,8 @@ interface AuthContexto {
   perfil: Usuario | null;
   /** Fila activa en empleado, o null si no es staff (spec 04). */
   empleado: Empleado | null;
+  /** Atajo de empleado?.rol === 'admin'. La base lo valida igual. */
+  esAdmin: boolean;
   /** true hasta saber si hay sesion y, si la hay, quien es. */
   cargando: boolean;
   salir: () => Promise<void>;
@@ -71,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     session,
     perfil,
     empleado,
+    esAdmin: empleado?.rol === 'admin',
     cargando: !sesionLista || !perfilListo,
     salir: async () => {
       await supabase.auth.signOut();

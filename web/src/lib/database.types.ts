@@ -49,6 +49,62 @@ export type Database = {
           },
         ]
       }
+      configuracion: {
+        Row: {
+          actualizado_at: string
+          actualizado_por: string | null
+          dias_anticipacion_max: number
+          factor_recargo: number
+          hora_primer_turno: string
+          hora_recargo_desde: string
+          hora_ultimo_turno: string
+          id: boolean
+          inasistencias_aviso: number
+          inasistencias_suspension: number
+          max_reservas_activas: number
+          meses_suspension: number
+          monto_sena: number
+        }
+        Insert: {
+          actualizado_at?: string
+          actualizado_por?: string | null
+          dias_anticipacion_max?: number
+          factor_recargo?: number
+          hora_primer_turno?: string
+          hora_recargo_desde?: string
+          hora_ultimo_turno?: string
+          id?: boolean
+          inasistencias_aviso?: number
+          inasistencias_suspension?: number
+          max_reservas_activas?: number
+          meses_suspension?: number
+          monto_sena?: number
+        }
+        Update: {
+          actualizado_at?: string
+          actualizado_por?: string | null
+          dias_anticipacion_max?: number
+          factor_recargo?: number
+          hora_primer_turno?: string
+          hora_recargo_desde?: string
+          hora_ultimo_turno?: string
+          id?: boolean
+          inasistencias_aviso?: number
+          inasistencias_suspension?: number
+          max_reservas_activas?: number
+          meses_suspension?: number
+          monto_sena?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuracion_actualizado_por_fkey"
+            columns: ["actualizado_por"]
+            isOneToOne: false
+            referencedRelation: "empleado"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       empleado: {
         Row: {
           activo: boolean
@@ -145,6 +201,8 @@ export type Database = {
           llegada_validada_at: string | null
           llegada_validada_por: string | null
           monto_sena: number
+          no_show_at: string | null
+          no_show_por: string | null
           precio_total: number
           sena_devuelta: boolean
           usuario_id: string
@@ -161,6 +219,8 @@ export type Database = {
           llegada_validada_at?: string | null
           llegada_validada_por?: string | null
           monto_sena?: number
+          no_show_at?: string | null
+          no_show_por?: string | null
           precio_total: number
           sena_devuelta?: boolean
           usuario_id: string
@@ -177,6 +237,8 @@ export type Database = {
           llegada_validada_at?: string | null
           llegada_validada_por?: string | null
           monto_sena?: number
+          no_show_at?: string | null
+          no_show_por?: string | null
           precio_total?: number
           sena_devuelta?: boolean
           usuario_id?: string
@@ -199,6 +261,13 @@ export type Database = {
           {
             foreignKeyName: "reserva_llegada_validada_por_fkey"
             columns: ["llegada_validada_por"]
+            isOneToOne: false
+            referencedRelation: "empleado"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reserva_no_show_por_fkey"
+            columns: ["no_show_por"]
             isOneToOne: false
             referencedRelation: "empleado"
             referencedColumns: ["id"]
@@ -237,20 +306,32 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          inasistencias: number
           nombre: string
+          suspendido_hasta: string | null
+          suspensiones: number
           telefono: string | null
+          vetado: boolean
         }
         Insert: {
           created_at?: string
           id: string
+          inasistencias?: number
           nombre: string
+          suspendido_hasta?: string | null
+          suspensiones?: number
           telefono?: string | null
+          vetado?: boolean
         }
         Update: {
           created_at?: string
           id?: string
+          inasistencias?: number
           nombre?: string
+          suspendido_hasta?: string | null
+          suspensiones?: number
           telefono?: string | null
+          vetado?: boolean
         }
         Relationships: []
       }
@@ -259,6 +340,59 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      actualizar_cancha: {
+        Args: {
+          p_activa?: boolean
+          p_cancha_id: string
+          p_precio_base?: number
+        }
+        Returns: {
+          activa: boolean
+          capacidad: number
+          id: string
+          numero: number
+          precio_base: number
+          sede_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "cancha"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      actualizar_configuracion: {
+        Args: {
+          p_dias_anticipacion_max?: number
+          p_factor_recargo?: number
+          p_hora_primer_turno?: string
+          p_hora_recargo_desde?: string
+          p_hora_ultimo_turno?: string
+          p_max_reservas_activas?: number
+          p_monto_sena?: number
+        }
+        Returns: {
+          actualizado_at: string
+          actualizado_por: string | null
+          dias_anticipacion_max: number
+          factor_recargo: number
+          hora_primer_turno: string
+          hora_recargo_desde: string
+          hora_ultimo_turno: string
+          id: boolean
+          inasistencias_aviso: number
+          inasistencias_suspension: number
+          max_reservas_activas: number
+          meses_suspension: number
+          monto_sena: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "configuracion"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       ahora_local: { Args: never; Returns: string }
       cancelar_reserva: {
         Args: { p_reserva_id: string; p_sena_devuelta: boolean }
@@ -279,6 +413,8 @@ export type Database = {
           llegada_validada_at: string | null
           llegada_validada_por: string | null
           monto_sena: number
+          no_show_at: string | null
+          no_show_por: string | null
           precio_total: number
           sena_devuelta: boolean
           usuario_id: string
@@ -300,17 +436,24 @@ export type Database = {
         }[]
       }
       empleado_a_cargo: { Args: { p_reserva_id: string }; Returns: string }
+      es_admin: { Args: never; Returns: boolean }
       es_empleado_de_sede: { Args: { p_sede_id: string }; Returns: boolean }
       es_turno_valido: { Args: { p_hora: string }; Returns: boolean }
       factor_recargo: { Args: never; Returns: number }
       hora_primer_turno: { Args: never; Returns: string }
       hora_recargo_desde: { Args: never; Returns: string }
       hora_ultimo_turno: { Args: never; Returns: string }
+      levantar_sancion: { Args: { p_usuario_id: string }; Returns: undefined }
+      marcar_inasistencia: {
+        Args: { p_reserva_id: string }
+        Returns: undefined
+      }
       max_reservas_activas: { Args: never; Returns: number }
       mi_empleado: {
         Args: never
         Returns: {
           empleado_id: string
+          rol: string
           sede_id: string
         }[]
       }
