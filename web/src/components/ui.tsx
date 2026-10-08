@@ -28,21 +28,43 @@ export function Boton({
   );
 }
 
+/**
+ * `error` es el mensaje propio de la app. Los campos no usan validacion
+ * nativa del navegador (step, pattern): se valida en codigo y se avisa
+ * acá, en castellano.
+ */
 export function Campo({
   etiqueta,
   id,
   ayuda,
+  error,
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { etiqueta: string; id: string; ayuda?: string }) {
+}: InputHTMLAttributes<HTMLInputElement> & {
+  etiqueta: string;
+  id: string;
+  ayuda?: string;
+  error?: string;
+}) {
   return (
     <label htmlFor={id} className="block">
       <span className="mb-1.5 block text-xs font-medium text-cream-dim">{etiqueta}</span>
       <input
         id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
         {...props}
-        className="w-full rounded-[10px] border border-cream/12 bg-pitch px-3.5 py-3 text-[15px] text-cream outline-none placeholder:text-cream-dim/50 focus:border-orange"
+        className={cn(
+          'w-full rounded-[10px] border bg-pitch px-3.5 py-3 text-[15px] text-cream outline-none placeholder:text-cream-dim/50 focus:border-orange',
+          error ? 'border-orange' : 'border-cream/12',
+        )}
       />
-      {ayuda && <span className="mt-1 block text-[11px] text-cream-dim">{ayuda}</span>}
+      {error ? (
+        <span id={`${id}-error`} role="alert" className="mt-1 block text-[11px] text-orange">
+          {error}
+        </span>
+      ) : (
+        ayuda && <span className="mt-1 block text-[11px] text-cream-dim">{ayuda}</span>
+      )}
     </label>
   );
 }

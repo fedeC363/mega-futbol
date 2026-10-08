@@ -6,6 +6,7 @@ import { Aviso, Boton, Campo } from '../components/ui';
 import { cn } from '../lib/cn';
 import { mensajeDeErrorAuth } from '../lib/errores';
 import { supabase } from '../lib/supabase';
+import { validarTelefono } from '../lib/validacion';
 
 /** A donde volver despues de ingresar; lo manda la pagina que trajo acá. */
 interface EstadoVuelta {
@@ -25,6 +26,7 @@ export function IngresarPage() {
   const [modo, setModo] = useState<'ingresar' | 'registro'>('ingresar');
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorTelefono, setErrorTelefono] = useState<string | null>(null);
   const [mailEnviadoA, setMailEnviadoA] = useState<string | null>(null);
 
   if (!cargando && session && !enviando) {
@@ -40,12 +42,22 @@ export function IngresarPage() {
     const password = String(f.get('password'));
     setEnviando(true);
     setError(null);
+    setErrorTelefono(null);
 
     if (modo === 'ingresar') {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       setEnviando(false);
       if (error) return setError(mensajeDeErrorAuth(error));
       return continuar();
+    }
+
+    // Validado por la app, no por el navegador: el cartel nativo de
+    // `pattern` no explica nada.
+    const telefono = validarTelefono(String(f.get('telefono')));
+    if (!telefono.ok) {
+      setEnviando(false);
+      setErrorTelefono(telefono.error);
+      return;
     }
 
     const { data, error } = await supabase.auth.signUp({
@@ -131,8 +143,7 @@ export function IngresarPage() {
               type="tel"
               autoComplete="tel"
               inputMode="tel"
-              pattern="[0-9 +()\-]{8,}"
-              title="Al menos 8 dígitos"
+              error={errorTelefono ?? undefined}
               ayuda="Lo usa el predio para contactarte por tu reserva."
               required
             />
