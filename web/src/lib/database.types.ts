@@ -361,6 +361,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      actualizar_canchas_sede: {
+        Args: { p_activa: boolean; p_sede_id: string }
+        Returns: number
+      }
       actualizar_configuracion: {
         Args: {
           p_dias_anticipacion_max?: number
