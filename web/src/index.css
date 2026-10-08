@@ -46,15 +46,6 @@
   }
 }
 
-/* Hatcheo de cesped de las canchas disponibles. */
-@utility bg-hatch-turf {
-  background: repeating-linear-gradient(
-    135deg,
-    var(--color-turf) 0 10px,
-    var(--color-turf-light) 10px 20px
-  );
-}
-
 /* Hatcheo tenue de las zonas no interactivas (predio, estacionamiento). */
 @utility bg-hatch-zone {
   background: repeating-linear-gradient(
