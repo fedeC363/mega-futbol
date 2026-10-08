@@ -14,12 +14,13 @@ interface Item {
 
 /**
  * Menu principal (spec de frontend 2.1). Mismo orden en los dos formatos:
- *  - mobile: FAB abajo a la izquierda que despliega los items hacia arriba.
- *  - desktop: rail fijo a la izquierda, colapsado muestra solo iconos.
+ *  - desktop: rail fijo a la izquierda, siempre visible y con las
+ *    etiquetas a la vista. No se abre ni se cierra.
+ *  - mobile: FAB abajo a la izquierda que despliega los items hacia
+ *    arriba, porque ahi no sobra el ancho para un rail.
  */
 export function SideMenu() {
   const { empleado, esAdmin } = useAuth();
-  const [railAbierto, setRailAbierto] = useState(false);
   const [fabAbierto, setFabAbierto] = useState(false);
   const { pathname } = useLocation();
 
@@ -39,31 +40,15 @@ export function SideMenu() {
 
   return (
     <>
-      {/* Desktop: rail */}
+      {/* Desktop: rail siempre a la vista */}
       <nav
         aria-label="Menú principal"
-        className={cn(
-          'relative z-40 hidden shrink-0 flex-col gap-1.5 border-r border-cream/8 bg-pitch-2 py-[18px] transition-[width] duration-200 md:flex',
-          railAbierto ? 'w-[220px] px-3' : 'w-16 items-center',
-        )}
+        className="hidden w-[220px] shrink-0 flex-col gap-1.5 border-r border-cream/8 bg-pitch-2 px-3 py-[18px] md:flex"
       >
-        <button
-          type="button"
-          onClick={() => setRailAbierto((v) => !v)}
-          aria-expanded={railAbierto}
-          aria-label={railAbierto ? 'Contraer menú' : 'Expandir menú'}
-          className={cn(
-            'mb-[18px] size-[38px] shrink-0 rounded-[10px] bg-orange text-[17px] text-ink',
-            railAbierto && 'self-start',
-          )}
-        >
-          ☰
-        </button>
         {items.map((item) => (
           <EnlaceMenu
             key={item.etiqueta}
             item={item}
-            title={railAbierto ? undefined : item.etiqueta}
             className={({ activo }) =>
               cn(
                 'flex items-center gap-3 overflow-hidden rounded-[10px] p-2.5 text-[13.5px] whitespace-nowrap hover:bg-cream/6 hover:text-cream',
@@ -74,7 +59,7 @@ export function SideMenu() {
             <span className="w-5 shrink-0 text-center text-base" aria-hidden="true">
               {item.icono}
             </span>
-            <span className={railAbierto ? '' : 'sr-only'}>{item.etiqueta}</span>
+            {item.etiqueta}
           </EnlaceMenu>
         ))}
       </nav>
@@ -129,7 +114,6 @@ function EnlaceMenu({
   className: (estado: { activo: boolean }) => string;
   oculto?: boolean;
   children: React.ReactNode;
-  title?: string;
   style?: React.CSSProperties;
   onClick?: () => void;
 }) {
