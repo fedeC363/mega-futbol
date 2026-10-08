@@ -85,13 +85,22 @@ configuracion, no hardcodeados.
 PANEL DE ADMIN (solo rol admin)
 -----------------------------------
 1. Cambiar el precio_base de cada cancha y darla de alta o de baja
-   (actualizar_cancha).
+   (actualizar_cancha), o dar de alta/baja todas las de la sede juntas
+   (actualizar_canchas_sede).
 2. Cambiar los parametros globales: horario del primer y del ultimo
    turno, hora y porcentaje del recargo, monto de la seña, tope de
    reservas activas y dias de anticipacion (actualizar_configuracion).
 
 Cambiar un precio no afecta a las reservas ya hechas: cada una congela
 su precio_total al crearse (spec 01).
+
+Los campos de este panel son de texto y se escriben con el teclado: no
+se usan inputs nativos con step ni selectores de hora del navegador,
+porque su validacion automatica impide guardar valores validos (poner
+15000 en la seña con step 100, por ejemplo). La validacion la hace la
+app y el error lo muestra el sitio. Los horarios exigen minutos 00:
+los turnos son de una hora en punto y es_turno_valido() rechaza
+cualquier otra cosa.
 
 Nada de esto requiere pantallas de configuracion de permisos ni
 gestion de usuarios empleados desde la propia app: por ahora, dar de

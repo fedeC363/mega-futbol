@@ -190,12 +190,18 @@ IMMUTABLE.
      baja tampoco cancela sus reservas futuras, solo impide tomar
      turnos nuevos.
 
-10) es_admin()
+10) actualizar_canchas_sede(p_sede_id, p_activa)   -- SOLO ADMIN
+    returns int (cuantas cambiaron)
+    - Da de alta o de baja TODAS las canchas de la sede de una vez, en
+      una sola operacion atomica. Mismas reglas que actualizar_cancha:
+      no cancela reservas ya hechas.
+
+11) es_admin()
     returns boolean
     - SECURITY DEFINER. El chequeo de rol admin en un solo lugar, igual
       que es_empleado_de_sede para el staff.
 
-11) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
+12) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
     Devuelve empleado_id, sede_id y rol.
 
 validar_llegada NO cambia el estado de la reserva: solo sella la
