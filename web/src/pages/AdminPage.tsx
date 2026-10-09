@@ -62,7 +62,7 @@ export function AdminPage() {
   return (
     <Pagina titulo="Panel de admin" subtitulo="Precios, horarios y disponibilidad del predio" ancho="max-w-3xl">
       <section>
-        <h2 className="text-[11px] tracking-[1.2px] text-cream-dim uppercase">Parámetros del negocio</h2>
+        <h2 className="font-display text-xl leading-none font-bold">Parámetros del negocio</h2>
         {config.error && (
           <div className="mt-3">
             <Aviso>{config.error}</Aviso>
@@ -81,7 +81,7 @@ export function AdminPage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="text-[11px] tracking-[1.2px] text-cream-dim uppercase">Canchas</h2>
+        <h2 className="font-display text-xl leading-none font-bold">Canchas</h2>
         {canchas.error && <Aviso>{canchas.error}</Aviso>}
         {canchas.cargando && !canchas.data && <Cargando />}
         {sedeId && canchas.data && (
