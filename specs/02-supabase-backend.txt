@@ -47,7 +47,7 @@ usuario:
   - INSERT: solo la via el trigger (no hace falta policy de insert para
     el cliente)
 
-sede, cancha, configuracion:
+sede, cancha, configuracion, bloqueo_cancha:
   - SELECT: true para todos (incluido anon) -- navegacion publica
   - INSERT/UPDATE/DELETE: sin policy para anon/authenticated y sin
     privilegios de escritura. sede se administra por migracion; el
@@ -102,8 +102,10 @@ IMMUTABLE.
    - Genera los turnos de 1 hora del dia, en punto, de 08:00 a 23:00
      (primer turno 08:00, ultimo 22:00), igual todos los dias.
    - "ocupado" es true si el turno tiene una reserva activa (estado <>
-     'cancelada') O si ya paso (turnos de hoy mas temprano que la hora
-     actual). Para el que reserva, los dos casos son "no se puede".
+     'cancelada'), si ya paso (turnos de hoy mas temprano que la hora
+     actual), o si esa cancha tiene un bloqueo que cubre esa fecha (ver
+     bloqueo_cancha en el spec 01; un dia bloqueado devuelve todos los
+     turnos ocupados). Para el que reserva son todos el mismo caso.
    - Calcula el precio de cada turno: precio_base, +10% si
      hora_inicio >= '19:00'.
    - Rechaza fechas pasadas y fechas a mas de 30 dias.
@@ -201,8 +203,28 @@ IMMUTABLE.
     - SECURITY DEFINER. El chequeo de rol admin en un solo lugar, igual
       que es_empleado_de_sede para el staff.
 
-12) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
+12) bloquear_cancha(p_cancha_id, p_desde, p_hasta, p_motivo, p_forzar)
+    -- SOLO ADMIN
+    returns bloqueo_cancha
+    - Saca una cancha de circulacion entre dos fechas (p_hasta en null
+      = un solo dia). Rechaza rangos invertidos, rangos que ya pasaron
+      y canchas inexistentes.
+    - Si hay reservas activas en el rango NO bloquea: avisa cuantas
+      son. Con p_forzar => true bloquea igual y las deja en pie, para
+      que el staff las resuelva a mano (mismo criterio que dar de baja
+      una cancha: el sistema no cancela ni devuelve plata solo).
+
+13) desbloquear_cancha(p_bloqueo_id)   -- SOLO ADMIN
+    returns void
+    - Levanta un bloqueo. Los turnos de esas fechas vuelven solos.
+
+14) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
     Devuelve empleado_id, sede_id y rol.
+
+No hay pantalla para los bloqueos todavia: se invocan las funciones.
+El chequeo de admin es el mismo que para precios y configuracion,
+porque bloquear fechas es una decision de negocio y no una tarea
+operativa del dia a dia.
 
 validar_llegada NO cambia el estado de la reserva: solo sella la
 llegada. Los estados 'completada' y 'no_show' estan definidos en el

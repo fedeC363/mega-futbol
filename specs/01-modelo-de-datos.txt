@@ -46,6 +46,31 @@ TABLA: cancha
 - activa        boolean, default true     -- para dar de baja una cancha sin borrarla
 - constraint UNIQUE(sede_id, numero)
 
+TABLA: bloqueo_cancha
+----------------------
+Fechas puntuales en las que una cancha no se puede reservar, sin darla
+de baja del todo: mantenimiento, un torneo, un evento privado.
+
+- id          uuid, PK
+- cancha_id   uuid, FK -> cancha.id, not null, on delete cascade
+- desde       date, not null
+- hasta       date, not null    -- inclusive; un solo dia = desde = hasta
+- motivo      text, nullable
+- creado_por  uuid, FK -> empleado.id, nullable
+- created_at  timestamptz, not null, default now()
+- constraint desde <= hasta
+- Indice en (cancha_id, desde, hasta) para la consulta de disponibilidad.
+
+Diferencia con cancha.activa: `activa` es un interruptor permanente que
+saca la cancha del mapa hasta nuevo aviso; un bloqueo es acotado a
+fechas y no cambia nada fuera de ellas. Un bloqueo cubre el dia entero:
+no se bloquean turnos sueltos (para eso el staff puede reservar el
+turno).
+
+Se escribe solo con bloquear_cancha / desbloquear_cancha, ambas de
+admin (ver spec 02). Lectura publica, para poder explicar por que un
+dia no tiene turnos.
+
 TABLA: reserva
 ---------------
 - id                    uuid, PK
