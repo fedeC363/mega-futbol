@@ -3,33 +3,40 @@ import { modalidad } from '../lib/canchas';
 import { cn } from '../lib/cn';
 
 /**
- * Proporcion de la tarjeta, en unidades del viewBox. 3:2 apaisado,
- * cerca de los 105 x 68 metros de una cancha real: cuadrada se veia
- * mal. Es la misma en mobile y en desktop, y tiene que coincidir con
- * la clase aspect-[3/2] de abajo para que el dibujo no se deforme.
+ * Orientacion de la tarjeta en el mapa. Una cancha es rectangular, asi
+ * que la tarjeta tambien: vertical donde la ranura de la grilla es
+ * angosta, y la misma proporcion rotada donde es ancha. Nunca cuadrada.
  */
-const MEDIDAS = { ancho: 150, alto: 100 } as const;
+export type Orientacion = 'vertical' | 'horizontal';
+
+const MEDIDAS: Record<Orientacion, { ancho: number; alto: number; clase: string }> = {
+  vertical: { ancho: 100, alto: 150, clase: 'aspect-[2/3]' },
+  horizontal: { ancho: 150, alto: 100, clase: 'aspect-[3/2]' },
+};
 
 /**
  * Lineas de una cancha vista desde arriba: perimetro, mediocampo,
  * circulo central con su punto y las dos areas.
  *
- * Se dibuja con las medidas de cada formato en vez de un viewBox fijo:
- * asi el dibujo llena la tarjeta entera (preserveAspectRatio="none" no
- * deforma nada porque el viewBox ya tiene la proporcion real) y el
- * circulo central sigue siendo un circulo en mobile y en desktop.
+ * El mediocampo siempre cruza el lado corto y las areas van en los dos
+ * extremos largos, igual que en una cancha de verdad: al rotar la
+ * tarjeta rota el dibujo, no se estira.
  *
- * El color sale de currentColor, asi el estado ocupado solo cambia una
+ * El viewBox tiene la misma proporcion que la tarjeta, asi que
+ * preserveAspectRatio="none" llena el espacio sin deformar nada y el
+ * circulo central sigue siendo un circulo.
+ *
+ * El color sale de currentColor: el estado ocupado solo cambia una
  * clase de texto.
  */
-function DibujoDeCancha({ ancho, alto }: { ancho: number; alto: number }) {
+function DibujoDeCancha({ ancho, alto, vertical }: { ancho: number; alto: number; vertical: boolean }) {
   const menor = Math.min(ancho, alto);
   const margen = menor * 0.07;
-  const trazo = menor * 0.018;
-  const radio = menor * 0.17;
-  const areaAncho = ancho * 0.46;
-  const areaAlto = alto * 0.15;
-  const areaX = (ancho - areaAncho) / 2;
+  const trazo = menor * 0.022;
+  const radio = menor * 0.19;
+  // El area es ancha en el sentido del arco y poco profunda hacia adentro.
+  const largo = (vertical ? ancho : alto) * 0.5;
+  const profundidad = (vertical ? alto : ancho) * 0.12;
 
   return (
     <svg
@@ -46,11 +53,23 @@ function DibujoDeCancha({ ancho, alto }: { ancho: number; alto: number }) {
           height={alto - margen * 2}
           rx={menor * 0.03}
         />
-        <line x1={margen} y1={alto / 2} x2={ancho - margen} y2={alto / 2} />
+
+        {vertical ? (
+          <>
+            <line x1={margen} y1={alto / 2} x2={ancho - margen} y2={alto / 2} />
+            <rect x={(ancho - largo) / 2} y={margen} width={largo} height={profundidad} />
+            <rect x={(ancho - largo) / 2} y={alto - margen - profundidad} width={largo} height={profundidad} />
+          </>
+        ) : (
+          <>
+            <line x1={ancho / 2} y1={margen} x2={ancho / 2} y2={alto - margen} />
+            <rect x={margen} y={(alto - largo) / 2} width={profundidad} height={largo} />
+            <rect x={ancho - margen - profundidad} y={(alto - largo) / 2} width={profundidad} height={largo} />
+          </>
+        )}
+
         <circle cx={ancho / 2} cy={alto / 2} r={radio} />
         <circle cx={ancho / 2} cy={alto / 2} r={trazo * 1.4} fill="currentColor" stroke="none" />
-        <rect x={areaX} y={margen} width={areaAncho} height={areaAlto} />
-        <rect x={areaX} y={alto - margen - areaAlto} width={areaAncho} height={areaAlto} />
       </g>
     </svg>
   );
@@ -63,18 +82,21 @@ function DibujoDeCancha({ ancho, alto }: { ancho: number; alto: number }) {
 export function CourtTile({
   cancha,
   variante,
+  orientacion = 'vertical',
   seleccionada,
   onSeleccionar,
   className,
 }: {
   cancha: CanchaMapa;
   variante: 'mobile' | 'desktop';
+  orientacion?: Orientacion;
   seleccionada: boolean;
   onSeleccionar: (id: string) => void;
   className?: string;
 }) {
   const { ocupada } = cancha;
   const desktop = variante === 'desktop';
+  const medidas = MEDIDAS[orientacion];
 
   return (
     <button
@@ -85,19 +107,19 @@ export function CourtTile({
       onClick={() => onSeleccionar(cancha.id)}
       className={cn(
         'relative flex items-center justify-center overflow-hidden rounded-[10px] border border-cream/20 transition duration-150',
-        'aspect-[3/2]',
+        medidas.clase,
         desktop && 'min-w-0 flex-1',
         ocupada
           ? 'cursor-not-allowed bg-occupied text-cream/25 opacity-55'
           : cn(
-              'cursor-pointer bg-turf text-cream/55 active:scale-[0.94]',
+              'cursor-pointer bg-turf text-cream/60 active:scale-[0.94]',
               desktop && 'hover:-translate-y-[3px] hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)] active:scale-100',
             ),
         seleccionada && 'outline-2 outline-offset-2 outline-orange',
         className,
       )}
     >
-      <DibujoDeCancha ancho={MEDIDAS.ancho} alto={MEDIDAS.alto} />
+      <DibujoDeCancha ancho={medidas.ancho} alto={medidas.alto} vertical={orientacion === 'vertical'} />
 
       <span
         className={cn(
