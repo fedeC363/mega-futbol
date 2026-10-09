@@ -109,6 +109,17 @@ export function StaffPage() {
       ancho="max-w-3xl"
       acciones={
         <div className="flex items-center gap-1.5">
+          {/* Siempre ocupa su lugar, aunque no se vea: si apareciera y
+              desapareciera, el selector de fecha saltaría de posición. */}
+          <Boton
+            variante="fantasma"
+            className={cn('px-2 py-2 text-[13px]', fecha === hoyBA() && 'invisible')}
+            aria-hidden={fecha === hoyBA()}
+            tabIndex={fecha === hoyBA() ? -1 : undefined}
+            onClick={() => setFecha(hoyBA())}
+          >
+            Ir a hoy
+          </Boton>
           <Boton variante="secundaria" className="px-3 py-2" aria-label="Día anterior" onClick={() => setFecha(sumarDias(fecha, -1))}>
             ‹
           </Boton>
@@ -122,14 +133,6 @@ export function StaffPage() {
           <Boton variante="secundaria" className="px-3 py-2" aria-label="Día siguiente" onClick={() => setFecha(sumarDias(fecha, 1))}>
             ›
           </Boton>
-          {fecha !== hoyBA() && (
-            // "Ir a hoy" y no "Hoy": es la acción de volver al día de
-            // hoy, y con el nombre corto parecía una etiqueta puesta en
-            // el día equivocado.
-            <Boton variante="fantasma" className="px-2 py-2 text-[13px]" onClick={() => setFecha(hoyBA())}>
-              Ir a hoy
-            </Boton>
-          )}
         </div>
       }
     >
