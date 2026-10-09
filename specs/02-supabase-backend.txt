@@ -221,6 +221,22 @@ IMMUTABLE.
 14) mi_empleado()  -- SECURITY INVOKER, ver AUTENTICACION arriba.
     Devuelve empleado_id, sede_id y rol.
 
+15) ocupacion_del_dia(p_sede_id uuid, p_fecha date)
+    returns table(cancha_id uuid, turnos_totales int,
+                  turnos_libres int, turnos_reservados int)
+    - El resumen que necesita el mapa, en una sola consulta en vez de
+      una por cancha. No requiere login.
+    - Reusa disponibilidad() por dentro, asi que el criterio de "libre"
+      es el mismo que ve el usuario al abrir una cancha.
+    - turnos_libres y turnos_reservados NO son lo mismo: un turno deja
+      de estar libre si esta reservado, si ya paso o si la cancha esta
+      bloqueada ese dia; turnos_reservados cuenta solo reservas
+      activas. El mapa usa libres = 0 para pintar la cancha de gris
+      (completa) y reservados/totales para elegir el color de las que
+      si tienen lugar (hasta 30% verde, mas de 30% amarillo, mas de
+      70% rojo). Con un solo numero, una cancha sin reservas se veria
+      llena al final del dia solo porque sus turnos ya pasaron.
+
 No hay pantalla para los bloqueos todavia: se invocan las funciones.
 El chequeo de admin es el mismo que para precios y configuracion,
 porque bloquear fechas es una decision de negocio y no una tarea
