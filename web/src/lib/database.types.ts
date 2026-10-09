@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      bloqueo_cancha: {
+        Row: {
+          cancha_id: string
+          creado_por: string | null
+          created_at: string
+          desde: string
+          hasta: string
+          id: string
+          motivo: string | null
+        }
+        Insert: {
+          cancha_id: string
+          creado_por?: string | null
+          created_at?: string
+          desde: string
+          hasta: string
+          id?: string
+          motivo?: string | null
+        }
+        Update: {
+          cancha_id?: string
+          creado_por?: string | null
+          created_at?: string
+          desde?: string
+          hasta?: string
+          id?: string
+          motivo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bloqueo_cancha_cancha_id_fkey"
+            columns: ["cancha_id"]
+            isOneToOne: false
+            referencedRelation: "cancha"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bloqueo_cancha_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "empleado"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cancha: {
         Row: {
           activa: boolean
@@ -398,6 +443,30 @@ export type Database = {
         }
       }
       ahora_local: { Args: never; Returns: string }
+      bloquear_cancha: {
+        Args: {
+          p_cancha_id: string
+          p_desde: string
+          p_forzar?: boolean
+          p_hasta?: string
+          p_motivo?: string
+        }
+        Returns: {
+          cancha_id: string
+          creado_por: string | null
+          created_at: string
+          desde: string
+          hasta: string
+          id: string
+          motivo: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bloqueo_cancha"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       cancelar_reserva: {
         Args: { p_reserva_id: string; p_sena_devuelta: boolean }
         Returns: undefined
@@ -430,6 +499,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      desbloquear_cancha: { Args: { p_bloqueo_id: string }; Returns: undefined }
       dias_anticipacion_max: { Args: never; Returns: number }
       disponibilidad: {
         Args: { p_cancha_id: string; p_fecha: string }
@@ -443,6 +513,10 @@ export type Database = {
       es_admin: { Args: never; Returns: boolean }
       es_empleado_de_sede: { Args: { p_sede_id: string }; Returns: boolean }
       es_turno_valido: { Args: { p_hora: string }; Returns: boolean }
+      esta_bloqueada: {
+        Args: { p_cancha_id: string; p_fecha: string }
+        Returns: boolean
+      }
       factor_recargo: { Args: never; Returns: number }
       hora_primer_turno: { Args: never; Returns: string }
       hora_recargo_desde: { Args: never; Returns: string }
