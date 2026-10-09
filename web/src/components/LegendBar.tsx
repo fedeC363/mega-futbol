@@ -10,13 +10,23 @@ export function LegendBar({ canchas }: { canchas: CanchaMapa[] }) {
 
   return (
     <div className="flex gap-2 overflow-x-auto px-[18px] pt-3.5 scrollbar-none md:gap-2.5 md:border-b md:border-cream/6 md:px-8 md:py-3.5">
+      {/* Escala de ocupacion del dia elegido: explica por que una
+          cancha esta de un color y no de otro. */}
       <Chip>
-        <span className="size-[9px] rounded-[2px] bg-turf-light" />
-        Disponible
+        <span className="size-[9px] rounded-[2px] bg-turf" />
+        Hasta 30%
+      </Chip>
+      <Chip>
+        <span className="size-[9px] rounded-[2px] bg-mostaza" />
+        30 a 70%
+      </Chip>
+      <Chip>
+        <span className="size-[9px] rounded-[2px] bg-ladrillo" />
+        Más de 70%
       </Chip>
       <Chip>
         <span className="size-[9px] rounded-[2px] bg-occupied" />
-        Ocupada
+        Completa
       </Chip>
       {precios.map(({ tipo, precio }) => (
         <Chip key={tipo}>

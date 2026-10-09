@@ -12,7 +12,9 @@
   --color-panel: #16281d;      /* paneles, tarjetas */
   --color-turf: #1f6e43;       /* cancha disponible (base) */
   --color-turf-light: #2c8a56; /* cancha disponible (acento) */
-  --color-occupied: #3a473f;   /* cancha ocupada */
+  --color-occupied: #3a473f;   /* cancha sin turnos libres */
+  --color-mostaza: #9c7a1f;    /* cancha con ocupacion media */
+  --color-ladrillo: #7a2a20;   /* cancha casi llena */
   --color-orange: #f2622e;     /* acento UNICO de accion */
   --color-ink: #1a0c05;        /* texto sobre naranja */
   --color-cream: #f3ede1;      /* texto principal */

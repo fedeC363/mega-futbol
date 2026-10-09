@@ -5,7 +5,7 @@ import { DateStrip } from '../components/DateStrip';
 import { LegendBar } from '../components/LegendBar';
 import { Aviso, Cargando } from '../components/ui';
 import { useCargado } from '../hooks/useCargado';
-import { tipoDeCancha, type CanchaMapa } from '../lib/canchas';
+import { nivelDeOcupacion, tipoDeCancha, type CanchaMapa } from '../lib/canchas';
 import {
   cargarCanchas,
   cargarOcupacion,
@@ -43,12 +43,18 @@ export function MapaPage() {
 
   const canchasMapa: CanchaMapa[] = useMemo(
     () =>
-      (canchas.data ?? []).map((c) => ({
-        ...c,
-        tipo: tipoDeCancha(c.capacidad),
-        // Mientras carga la ocupacion, nada se muestra como ocupado.
-        ocupada: ocupacion.data ? (ocupacion.data.get(c.id) ?? 0) === 0 : false,
-      })),
+      (canchas.data ?? []).map((c) => {
+        const ocup = ocupacion.data?.get(c.id);
+        const porcentaje = ocup?.porcentaje ?? 0;
+        return {
+          ...c,
+          tipo: tipoDeCancha(c.capacidad),
+          // Mientras carga la ocupacion, nada se muestra como ocupado.
+          ocupada: ocup ? ocup.libres === 0 : false,
+          porcentaje,
+          nivel: nivelDeOcupacion(porcentaje),
+        };
+      }),
     [canchas.data, ocupacion.data],
   );
 

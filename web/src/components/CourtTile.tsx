@@ -1,6 +1,17 @@
-import type { CanchaMapa } from '../lib/canchas';
+import type { CanchaMapa, NivelOcupacion } from '../lib/canchas';
 import { modalidad } from '../lib/canchas';
 import { cn } from '../lib/cn';
+
+/**
+ * Fondo y color de las lineas segun que tan pedida esta la cancha. El
+ * badge naranja no cambia nunca: es el ancla visual del numero.
+ * Los tres niveles tienen turnos libres, asi que los tres se clickean.
+ */
+const PALETA: Record<NivelOcupacion, string> = {
+  verde: 'bg-turf text-cream/60',
+  amarillo: 'bg-mostaza text-[#fff7e0]/65',
+  rojo: 'bg-ladrillo text-[#ffe6de]/60',
+};
 
 /**
  * Orientacion de la tarjeta en el mapa. Una cancha es rectangular, asi
@@ -103,7 +114,9 @@ export function CourtTile({
       type="button"
       disabled={ocupada}
       aria-pressed={seleccionada}
-      aria-label={`Cancha ${cancha.numero}, ${modalidad(cancha.tipo)}, ${ocupada ? 'sin turnos libres' : 'disponible'}`}
+      aria-label={`Cancha ${cancha.numero}, ${modalidad(cancha.tipo)}, ${
+        ocupada ? 'sin turnos libres' : `${cancha.porcentaje}% ocupada, disponible`
+      }`}
       onClick={() => onSeleccionar(cancha.id)}
       className={cn(
         'relative flex items-center justify-center overflow-hidden rounded-[10px] border border-cream/20 transition duration-150',
@@ -112,7 +125,8 @@ export function CourtTile({
         ocupada
           ? 'cursor-not-allowed bg-occupied text-cream/25 opacity-55'
           : cn(
-              'cursor-pointer bg-turf text-cream/60 active:scale-[0.94]',
+              'cursor-pointer active:scale-[0.94]',
+              PALETA[cancha.nivel],
               desktop && 'hover:-translate-y-[3px] hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)] active:scale-100',
             ),
         seleccionada && 'outline-2 outline-offset-2 outline-orange',

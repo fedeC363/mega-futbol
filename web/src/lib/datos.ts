@@ -103,14 +103,38 @@ export async function cargarDisponibilidad(canchaId: string, fecha: string): Pro
   return data;
 }
 
-/** cancha_id -> cantidad de turnos libres ese dia. */
-export async function cargarOcupacion(sedeId: string, fecha: string): Promise<Map<string, number>> {
+export interface OcupacionCancha {
+  totales: number;
+  /** Turnos que todavia se pueden reservar. */
+  libres: number;
+  /** Reservas activas del dia. */
+  reservados: number;
+  /** reservados / totales, redondeado. */
+  porcentaje: number;
+}
+
+/** cancha_id -> como viene la ocupacion de esa cancha ese dia. */
+export async function cargarOcupacion(
+  sedeId: string,
+  fecha: string,
+): Promise<Map<string, OcupacionCancha>> {
   const { data, error } = await supabase.rpc('ocupacion_del_dia', {
     p_sede_id: sedeId,
     p_fecha: fecha,
   });
   if (error) throw error;
-  return new Map(data.map((fila) => [fila.cancha_id, fila.turnos_libres]));
+  return new Map(
+    data.map((fila) => [
+      fila.cancha_id,
+      {
+        totales: fila.turnos_totales,
+        libres: fila.turnos_libres,
+        reservados: fila.turnos_reservados,
+        porcentaje:
+          fila.turnos_totales > 0 ? Math.round((fila.turnos_reservados / fila.turnos_totales) * 100) : 0,
+      },
+    ]),
+  );
 }
 
 export function porcentajeRecargo(p: Parametros): number {
