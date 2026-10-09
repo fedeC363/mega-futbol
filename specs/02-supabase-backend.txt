@@ -248,6 +248,11 @@ modelo pero todavia ninguna funcion los escribe.
 
 EDGE FUNCTIONS (fase 2, Deno/TypeScript en supabase/functions/)
 --------------------------------------------------------------------
+EN PAUSA, SIN FECHA: ninguna de estas dos existe en el repo. El
+proyecto es una pieza de portfolio y se decidio no integrar pagos
+reales (ver spec 00, CONTEXTO DEL PROYECTO, y spec 03). Queda escrito
+como referencia.
+
 1) crear-preferencia-pago
    - La llama el frontend (usuario autenticado) pasando reserva_id.
    - Usa el MERCADOPAGO_ACCESS_TOKEN (guardado como secreto de

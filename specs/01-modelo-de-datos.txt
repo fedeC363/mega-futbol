@@ -146,7 +146,7 @@ Las funciones hora_primer_turno(), monto_sena_default() y companía
 siguen existiendo con el mismo nombre y la misma firma: ahora leen esta
 tabla. Por eso dejaron de ser IMMUTABLE y pasaron a STABLE.
 
-TABLA: pago  (FASE 2 - no se implementa en el MVP, pero dejar modelada)
+TABLA: pago  (FASE 2 EN PAUSA - existe en el esquema, nadie la escribe)
 -------------------------------------------------------------------------
 - id                    uuid, PK
 - reserva_id            uuid, FK -> reserva.id, not null, unique

@@ -2,8 +2,14 @@ MEGA FUTBOL - FLUJO DE RESERVA Y PAGOS
 Spec 03 de 6 - requiere haber leido 00, 01 y 02
 ===================================================
 
-FASE 1 - MVP (sin integrar el pago todavia)
------------------------------------------------
+ESTADO: el flujo vigente y definitivo del proyecto es el de la Fase 1,
+seña por transferencia con confirmacion manual del staff. La Fase 2
+(pago real con Mercado Pago) esta EN PAUSA, SIN FECHA: queda descripta
+mas abajo como referencia, pero no se implementa. Ver el contexto del
+proyecto en el spec 00.
+
+FASE 1 - FLUJO VIGENTE: seña por transferencia, confirmada por el staff
+-------------------------------------------------------------------------
 1. El usuario navega la pagina sin loguearse y ve el mapa de canchas
    (el front lo arma Federico; este spec solo define que datos hacen
    falta: select directo a la tabla cancha via supabase-js, permitido
@@ -20,14 +26,14 @@ FASE 1 - MVP (sin integrar el pago todavia)
    supabase.rpc('crear_reserva', { p_cancha_id, p_fecha,
    p_hora_inicio }).
 
-   DECISION PARA EL MVP: como todavia no hay integracion de pago, la
-   reserva se crea igual en estado 'pendiente_pago', pero se sigue
-   mostrando en la agenda del staff (la policy de SELECT de reserva ya
-   contempla a los empleados de la sede, sin importar el estado). No
-   hace falta logica de expiracion todavia: eso se suma recien en la
-   Fase 2, junto con el pago real. La idea es no tener que reescribir
-   el modelo cuando se integre Mercado Pago, solo agregar el paso de
-   pago en el medio.
+   La reserva se crea en estado 'pendiente_pago' y se muestra en la
+   agenda del staff (la policy de SELECT de reserva ya contempla a los
+   empleados de la sede, sin importar el estado). No hay logica de
+   expiracion: la confirmacion es manual y el staff puede tardar.
+
+   El modelo quedo preparado para que, si algun dia se retoma el pago
+   real, alcance con agregar el paso de pago en el medio sin reescribir
+   nada de lo que ya existe.
 
    El frontend NO debe decir "reserva confirmada" en este punto: la
    reserva existe pero esta pendiente de la sena.
@@ -43,8 +49,18 @@ FASE 1 - MVP (sin integrar el pago todavia)
 7. El dia del turno, el empleado valida que el usuario llego y arranco
    a jugar llamando a supabase.rpc('validar_llegada', { p_reserva_id }).
 
-FASE 2 - agregar el pago real de la sena
---------------------------------------------
+FASE 2 - PAGO REAL CON MERCADO PAGO  [EN PAUSA, SIN FECHA]
+---------------------------------------------------------------
+NO IMPLEMENTAR. Decision de alcance: el proyecto es una pieza de
+portfolio y no opera como negocio real, asi que se evita mover dinero
+de verdad (ver spec 00, CONTEXTO DEL PROYECTO).
+
+Lo que sigue queda escrito tal como estaba planteado, como referencia
+por si algun dia se retoma. Nada de esto existe en el codigo: no hay
+Edge Functions, ni tabla pago escrita, ni comprobantes por mail, ni
+expiracion automatica. Mientras tanto, los pasos 5 a 7 de arriba son
+el flujo real y definitivo.
+
 8. Al crear la reserva (o justo despues), el frontend llama a la Edge
    Function crear-preferencia-pago con el reserva_id, que genera el QR
    de Mercado Pago por el monto de la sena ($15.000).

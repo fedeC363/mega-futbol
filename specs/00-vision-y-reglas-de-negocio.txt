@@ -8,6 +8,18 @@ Mega Futbol es una cadena de canchas de futbol. Este proyecto arranca
 enfocado en una sola sede: San Justo. La idea es que la pagina permita
 reservar una cancha con la minima interaccion humana posible.
 
+CONTEXTO DEL PROYECTO: ALCANCE
+----------------------------------
+Esto es una pieza de portfolio personal, no un sistema operando como
+negocio real. Por eso se decidio NO integrar pagos reales: la Fase 2
+(Mercado Pago) queda EN PAUSA, SIN FECHA, por seguridad y prevencion,
+para no mover dinero de verdad en un proyecto de portfolio.
+
+El flujo vigente y definitivo, ya implementado, es: el usuario reserva,
+transfiere la seña por fuera del sistema y un empleado la confirma a
+mano desde el panel de staff (spec 03). Las reglas 6 y 8 de abajo
+describen el flujo con Mercado Pago, que queda como referencia.
+
 STACK Y ALCANCE DE ESTOS SPECS
 ---------------------------------
 Backend: Supabase (Postgres administrado + Auth + Row Level Security +
@@ -69,17 +81,21 @@ REGLAS DE NEGOCIO CONFIRMADAS
    spec 01), el precio_base mas bajo es $40.000, asi que la sena nunca
    supera el precio total.
 
-6. El pago de la sena se hace por Mercado Pago (QR). Cuando el pago se
-   confirma, el turno queda bloqueado para el resto de los usuarios.
-   Antes de que se confirme el pago, la reserva existe pero no deberia
-   considerarse garantizada (ver spec 03 sobre expiracion).
+6. [EN PAUSA - ver ALCANCE arriba] El pago de la sena se haria por
+   Mercado Pago (QR). Cuando el pago se confirma, el turno queda
+   bloqueado para el resto de los usuarios.
+   VIGENTE HOY: la seña se transfiere por fuera del sistema y un
+   empleado confirma la reserva a mano (confirmar_reserva). Hasta esa
+   confirmacion, la reserva existe pero no esta garantizada.
 
 7. El resto del monto (precio total menos la sena) se cobra en
    efectivo o transferencia el dia de juego, en persona, entre el
    usuario y un empleado. EL SISTEMA NO GESTIONA ESE COBRO. Como mucho
    puede mostrarlo como referencia (cuanto falta pagar).
 
-8. El comprobante del pago de la sena se envia al Gmail del usuario.
+8. [EN PAUSA - ver ALCANCE arriba] El comprobante del pago de la sena
+   se enviaria al Gmail del usuario. Hoy no se manda ningun mail de
+   comprobante.
 
 9. El dia del turno, un empleado debe validar manualmente que los
    usuarios llegaron y arrancaron a jugar. Esto es necesario porque los

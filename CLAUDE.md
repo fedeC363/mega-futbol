@@ -44,7 +44,11 @@ página principal es un mapa minimalista del predio con las canchas.
 
 ## Reglas de negocio clave (resumen — el detalle está en los specs)
 
-- Seña fija: $15.000 ARS por Mercado Pago, bloquea el turno al confirmarse.
+- Seña fija: $15.000 ARS. El usuario la transfiere por fuera del
+  sistema y un empleado confirma la reserva a mano desde el panel de
+  staff. El pago con Mercado Pago está **en pausa, sin fecha**: es un
+  proyecto de portfolio y se decidió no mover dinero real (ver
+  `specs/00` y `specs/03`).
 - El resto se cobra en efectivo/transferencia en persona — el sistema NO lo gestiona.
 - Recargo del 10% en turnos que arrancan a las 19:00 o más tarde.
 - Turnos de 1 hora, sin superposición por cancha (constraint a nivel de base de datos).
@@ -71,7 +75,7 @@ que se haya confirmado que la anterior está lista:
 
 - **Fase 0** — Fundación: repo, `supabase init`, migraciones iniciales (tablas, RLS, funciones básicas).
 - **Fase 1** — MVP: login (Supabase Auth), mapa de canchas, disponibilidad, crear reserva, panel de staff básico.
-- **Fase 2** — Pagos: Edge Functions de Mercado Pago (preferencia + webhook), comprobante por mail, expiración de reservas sin pagar.
+- **Fase 2** — Pagos con Mercado Pago: **en pausa, sin fecha.** No implementar (decisión de alcance, ver `specs/00`).
 - **Fase 3** — Reglas de precio y contenido: recargo horario, botones de contacto (WhatsApp/Instagram) y Beelup, identidad visual final.
 - **Fase 4** — Escalar: multi-sede real, notificaciones, reportes.
 

@@ -12,11 +12,11 @@ CUENTAS Y HERRAMIENTAS (fuera del codigo)
   contra el proyecto de Supabase en la nube (ver spec 02). Docker solo
   se necesita si mas adelante se quiere un stack local descartable con
   `supabase start` (util para probar Edge Functions en la Fase 2).
-- Cuenta de Mercado Pago Developers (recien para la Fase 2), para
-  obtener el Access Token de prueba y de produccion.
-- Cuenta en un proveedor de mail transaccional (recien para la Fase 2):
-  Resend o SendGrid son las opciones mas simples para mandar el
-  comprobante de la sena.
+- [NO HACE FALTA] Cuenta de Mercado Pago Developers y cuenta en un
+  proveedor de mail transaccional (Resend, SendGrid). Eran para la
+  Fase 2, que esta EN PAUSA SIN FECHA: el proyecto es una pieza de
+  portfolio y no integra pagos reales (ver spec 00, CONTEXTO DEL
+  PROYECTO). No hay que crear ninguna de las dos.
 
 REPOSITORIO EN GITHUB
 --------------------------
