@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CourtsMap } from '../components/CourtsMap';
 import { DateStrip } from '../components/DateStrip';
 import { LegendBar } from '../components/LegendBar';
@@ -75,6 +75,17 @@ export function MapaPage() {
           )}
           {canchas.cargando && !canchas.data?.length ? (
             <Cargando texto="Cargando el mapa…" />
+          ) : canchas.data?.length === 0 ? (
+            // Todas las canchas dadas de baja: el mapa vacio no dice nada.
+            <div className="rounded-xl border border-cream/10 bg-panel px-5 py-10 text-center">
+              <p className="text-[15px] font-medium">Por el momento no hay canchas disponibles para reservar</p>
+              <p className="mx-auto mt-2 max-w-sm text-[13px] text-cream-dim">
+                Escribinos y te avisamos cuando se habiliten de nuevo.
+              </p>
+              <Link to="/contacto" className="mt-4 inline-block text-[14px] font-semibold text-orange">
+                Ver contacto →
+              </Link>
+            </div>
           ) : (
             <CourtsMap
               canchas={canchasMapa}
