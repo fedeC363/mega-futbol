@@ -3,14 +3,30 @@ import { modalidad } from '../lib/canchas';
 import { cn } from '../lib/cn';
 
 /**
- * Fondo y color de las lineas segun que tan pedida esta la cancha. El
- * badge naranja no cambia nunca: es el ancla visual del numero.
+ * Colores segun que tan pedida esta la cancha. `tarjeta` pinta el fondo
+ * y, via currentColor, las lineas del dibujo.
+ *
+ * El badge es naranja sobre el verde, pero blanco sobre el mostaza y el
+ * ladrillo: contra esos dos fondos calidos el naranja se pierde.
+ *
  * Los tres niveles tienen turnos libres, asi que los tres se clickean.
  */
-const PALETA: Record<NivelOcupacion, string> = {
-  verde: 'bg-turf text-cream/60',
-  amarillo: 'bg-mostaza text-[#fff7e0]/65',
-  rojo: 'bg-ladrillo text-[#ffe6de]/60',
+const PALETA: Record<NivelOcupacion, { tarjeta: string; badge: string; tipo: string }> = {
+  verde: {
+    tarjeta: 'bg-turf text-cream/60',
+    badge: 'bg-orange text-ink',
+    tipo: 'text-[#3a1d0d]',
+  },
+  amarillo: {
+    tarjeta: 'bg-mostaza text-[#fff7e0]/65',
+    badge: 'bg-cream text-ink',
+    tipo: 'text-ink/65',
+  },
+  rojo: {
+    tarjeta: 'bg-ladrillo text-[#ffe6de]/60',
+    badge: 'bg-cream text-ink',
+    tipo: 'text-ink/65',
+  },
 };
 
 /**
@@ -126,7 +142,7 @@ export function CourtTile({
           ? 'cursor-not-allowed bg-occupied text-cream/25 opacity-55'
           : cn(
               'cursor-pointer active:scale-[0.94]',
-              PALETA[cancha.nivel],
+              PALETA[cancha.nivel].tarjeta,
               desktop && 'hover:-translate-y-[3px] hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)] active:scale-100',
             ),
         seleccionada && 'outline-2 outline-offset-2 outline-orange',
@@ -139,7 +155,7 @@ export function CourtTile({
         className={cn(
           'relative z-10 min-w-[34px] rounded-lg px-2 pt-[7px] pb-1.5 text-center font-display leading-none font-bold shadow-[0_4px_10px_rgba(0,0,0,0.25)]',
           desktop ? 'min-w-[38px] px-2.5 pt-2 pb-[7px] text-[15px]' : 'text-sm',
-          ocupada ? 'bg-[#5b675e] text-[#c9d2cb]' : 'bg-orange text-ink',
+          ocupada ? 'bg-[#5b675e] text-[#c9d2cb]' : PALETA[cancha.nivel].badge,
         )}
       >
         {cancha.numero}
@@ -147,7 +163,7 @@ export function CourtTile({
           className={cn(
             'mt-0.5 block font-sans text-[8px] font-medium tracking-[0.3px]',
             desktop && 'text-[8.5px]',
-            ocupada ? 'text-[#8a9990]' : 'text-[#3a1d0d]',
+            ocupada ? 'text-[#8a9990]' : PALETA[cancha.nivel].tipo,
           )}
         >
           {cancha.tipo}
