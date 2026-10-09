@@ -170,8 +170,10 @@ IMMUTABLE.
      tiene la llegada validada (el usuario si se presento) o si el
      turno todavia no empezo.
    - Pasa la reserva a 'no_show' y guarda no_show_at / no_show_por.
-   - Suma 1 al contador del usuario y, si llego al umbral, aplica la
-     sancion que corresponda (ver spec 04).
+   - Suma 1 al contador del usuario (la columna usuario.inasistencias,
+     NO un conteo de reservas no_show) y, si llego al umbral, aplica la
+     sancion que corresponda (ver spec 04). Que sea una columna es lo
+     que permite borrar las reservas viejas sin perder la sancion.
 
 7) levantar_sancion(p_usuario_id uuid)   -- SOLO ADMIN
    returns void
@@ -237,6 +239,12 @@ IMMUTABLE.
       70% rojo). Con un solo numero, una cancha sin reservas se veria
       llena al final del dia solo porque sus turnos ya pasaron.
 
+16) borrar_reservas_vencidas()
+    returns int (cuantas borro)
+    - La ejecuta el cron (ver TAREAS PROGRAMADAS). Sin sesion corre
+      libre; con sesion, solo un admin, porque no es una tarea
+      operativa del dia a dia.
+
 No hay pantalla para los bloqueos todavia: se invocan las funciones.
 El chequeo de admin es el mismo que para precios y configuracion,
 porque bloquear fechas es una decision de negocio y no una tarea
@@ -245,6 +253,25 @@ operativa del dia a dia.
 validar_llegada NO cambia el estado de la reserva: solo sella la
 llegada. Los estados 'completada' y 'no_show' estan definidos en el
 modelo pero todavia ninguna funcion los escribe.
+
+TAREAS PROGRAMADAS (pg_cron)
+--------------------------------
+Corren dentro de la base, no hace falta un servicio aparte. pg_cron
+programa en UTC.
+
+- borrar-reservas-vencidas, todos los dias 04:15 UTC (01:15 en Buenos
+  Aires, despues del ultimo turno): ejecuta
+  borrar_reservas_vencidas(), que elimina definitivamente toda reserva
+  cuyo turno termino hace mas de dias_retencion_reservas (15 por
+  defecto, en configuracion), en cualquier estado.
+
+  Se borra la fila entera, no se archiva. Lo que importa del historial
+  (las amonestaciones) ya vive en columnas de usuario, asi que no se
+  pierde. Lo que si desaparece es el detalle del turno: despues de 15
+  dias, ni el usuario lo ve en su perfil ni el staff en la agenda.
+
+  La tabla pago apunta a reserva con on delete cascade, para que el dia
+  que exista un pago el borrado no falle en silencio desde el cron.
 
 EDGE FUNCTIONS (fase 2, Deno/TypeScript en supabase/functions/)
 --------------------------------------------------------------------

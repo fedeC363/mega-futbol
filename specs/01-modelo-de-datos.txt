@@ -13,7 +13,9 @@ TABLA: usuario  (extiende a auth.users, no la reemplaza)
 - nombre            text, not null
 - telefono          text, nullable
 - created_at        timestamptz, default now()
-- inasistencias     int, not null, default 0    -- del ciclo actual
+- inasistencias     int, not null, default 0    -- del ciclo actual;
+                      persistente a proposito, NO se calcula contando
+                      reservas no_show (ver abajo)
 - suspensiones      int, not null, default 0    -- cuantas cumplio
 - suspendido_hasta  timestamptz, nullable       -- no puede reservar hasta aca
 - vetado            boolean, not null, default false  -- veto permanente
@@ -28,6 +30,13 @@ Notas:
   on_auth_user_created). Documentarlo en la migracion.
 - Un empleado tambien es un usuario (ver tabla empleado). No hay tabla
   separada de "clientes".
+- Los cuatro campos de amonestaciones (inasistencias, suspensiones,
+  suspendido_hasta, vetado) son columnas y no consultas sobre reserva.
+  Eso es lo que permite borrar las reservas viejas sin perder el
+  historial de sanciones: las reservas se eliminan 15 dias despues de
+  terminado el turno (ver spec 02, TAREAS PROGRAMADAS), y si el
+  contador se calculara contando filas no_show, un usuario sancionado
+  volveria a cero solo porque paso el tiempo.
 
 TABLA: sede
 ------------
@@ -132,6 +141,9 @@ los edita.
 - monto_sena                numeric(10,2), not null, default 15000
 - max_reservas_activas      int, not null, default 3
 - dias_anticipacion_max     int, not null, default 30
+- dias_retencion_reservas   int, not null, default 15
+                              -- dias que se conserva una reserva
+                                 despues de que termino el turno
 - inasistencias_aviso       int, not null, default 2
 - inasistencias_suspension  int, not null, default 5
 - meses_suspension          int, not null, default 2
