@@ -123,8 +123,11 @@ export function StaffPage() {
             ›
           </Boton>
           {fecha !== hoyBA() && (
+            // "Ir a hoy" y no "Hoy": es la acción de volver al día de
+            // hoy, y con el nombre corto parecía una etiqueta puesta en
+            // el día equivocado.
             <Boton variante="fantasma" className="px-2 py-2 text-[13px]" onClick={() => setFecha(hoyBA())}>
-              Hoy
+              Ir a hoy
             </Boton>
           )}
         </div>
