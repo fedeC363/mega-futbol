@@ -541,6 +541,8 @@ export type Database = {
         Returns: {
           cancha_id: string
           turnos_libres: number
+          turnos_reservados: number
+          turnos_totales: number
         }[]
       }
       precio_turno: {
