@@ -70,9 +70,10 @@
 }
 
 /*
- * En CSS plano y no como utilidad de Tailwind: la version con @utility
- * generaba la animacion pero se comia el @media anidado, y la cancha
- * seguia pulsando con "reducir movimiento" activado.
+ * En CSS plano y no como utilidad de Tailwind: la animacion y su
+ * excepcion de accesibilidad quedan juntas y a la vista, sin depender
+ * de como se expanda una utilidad propia con media query anidada.
+ * Verificado leyendo el CSS generado: la regla existe.
  */
 .cancha-clickeable:hover {
   animation: cancha-press 260ms cubic-bezier(0.3, 0.7, 0.4, 1) 1;
