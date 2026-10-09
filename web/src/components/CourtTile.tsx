@@ -2,11 +2,13 @@ import type { CanchaMapa } from '../lib/canchas';
 import { modalidad } from '../lib/canchas';
 import { cn } from '../lib/cn';
 
-/** Proporciones de la tarjeta segun el formato, en unidades del viewBox. */
-const MEDIDAS = {
-  mobile: { ancho: 100, alto: 105 },
-  desktop: { ancho: 100, alto: 85 },
-} as const;
+/**
+ * Proporcion de la tarjeta, en unidades del viewBox. 3:2 apaisado,
+ * cerca de los 105 x 68 metros de una cancha real: cuadrada se veia
+ * mal. Es la misma en mobile y en desktop, y tiene que coincidir con
+ * la clase aspect-[3/2] de abajo para que el dibujo no se deforme.
+ */
+const MEDIDAS = { ancho: 150, alto: 100 } as const;
 
 /**
  * Lineas de una cancha vista desde arriba: perimetro, mediocampo,
@@ -73,7 +75,6 @@ export function CourtTile({
 }) {
   const { ocupada } = cancha;
   const desktop = variante === 'desktop';
-  const medidas = MEDIDAS[variante];
 
   return (
     <button
@@ -84,7 +85,8 @@ export function CourtTile({
       onClick={() => onSeleccionar(cancha.id)}
       className={cn(
         'relative flex items-center justify-center overflow-hidden rounded-[10px] border border-cream/20 transition duration-150',
-        desktop ? 'aspect-[1/0.85] min-w-0 flex-1' : 'aspect-[1/1.05]',
+        'aspect-[3/2]',
+        desktop && 'min-w-0 flex-1',
         ocupada
           ? 'cursor-not-allowed bg-occupied text-cream/25 opacity-55'
           : cn(
@@ -95,7 +97,7 @@ export function CourtTile({
         className,
       )}
     >
-      <DibujoDeCancha ancho={medidas.ancho} alto={medidas.alto} />
+      <DibujoDeCancha ancho={MEDIDAS.ancho} alto={MEDIDAS.alto} />
 
       <span
         className={cn(

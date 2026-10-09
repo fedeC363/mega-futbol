@@ -34,8 +34,11 @@ export function CourtsMap({
 
   return (
     <>
-      {/* Mobile: grilla de 6 columnas del boceto mobile */}
-      <div className="grid grid-cols-6 gap-2 md:hidden">
+      {/* Pantallas angostas y medianas: grilla de 6 columnas del boceto
+          mobile. Se usa hasta 1024px y no hasta 768px porque con el
+          menu fijo al costado, la fila de 7 canchas del otro diseño
+          queda tan apretada que el numero no entra en la tarjeta. */}
+      <div className="grid grid-cols-6 gap-2 lg:hidden">
         {f8.map((c) => tile(c, 'mobile', 'col-span-3'))}
         {f7.map((c) => tile(c, 'mobile', 'col-span-2'))}
         <Zona className="col-span-6 mt-2 min-h-[52px]">Predio · vestuarios &amp; buffet</Zona>
@@ -44,18 +47,22 @@ export function CourtsMap({
         <Zona className="col-span-6 mt-2 min-h-10">Estacionamiento</Zona>
       </div>
 
-      {/* Desktop: filas del boceto desktop */}
-      <div className="hidden flex-col gap-2.5 md:flex">
+      {/* Desktop ancho: filas del boceto desktop */}
+      <div className="hidden flex-col gap-2.5 lg:flex">
         <div className="flex gap-2.5">{f8.map((c) => tile(c, 'desktop'))}</div>
         <div className="flex items-stretch gap-2.5">
           <div className="flex min-w-0 flex-1 flex-col gap-2.5">
             <div className="flex gap-2.5">{f7.map((c) => tile(c, 'desktop'))}</div>
             <div className="flex gap-2.5">{[...f6, ...f5.slice(0, 3)].map((c) => tile(c, 'desktop'))}</div>
           </div>
-          <Zona className="w-[220px] shrink-0">Predio · vestuarios &amp; buffet</Zona>
+          {/* Angosto hasta que sobre ancho: lo que le saque al predio se
+              lo lleva la fila de canchas, que es la que lo necesita. */}
+          <Zona className="w-[150px] shrink-0 xl:w-[220px]">Predio · vestuarios &amp; buffet</Zona>
         </div>
         <div className="flex gap-2.5">
-          <div className="flex w-[260px] shrink-0 gap-2.5">{f5.slice(3).map((c) => tile(c, 'desktop'))}</div>
+          {/* Mas ancho que el resto de la fila: son tres canchas apaisadas
+              y si el bloque es angosto quedan demasiado chatas. */}
+          <div className="flex w-[340px] shrink-0 gap-2.5">{f5.slice(3).map((c) => tile(c, 'desktop'))}</div>
           <Zona className="flex-1">Estacionamiento</Zona>
         </div>
       </div>
