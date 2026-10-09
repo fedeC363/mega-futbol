@@ -48,6 +48,42 @@
   }
 }
 
+/*
+ * Pulso hacia el fondo: la cancha se hunde rapido y vuelve. Se dispara
+ * al entrar el mouse, una sola vez por entrada (no es un estado
+ * sostenido). Solo transform y box-shadow, asi no mueve la grilla ni
+ * empuja a las canchas vecinas.
+ */
+@keyframes cancha-press {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 6px 14px rgb(0 0 0 / 0.35);
+  }
+  35% {
+    transform: scale(0.94);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 6px 14px rgb(0 0 0 / 0.35);
+  }
+}
+
+/*
+ * En CSS plano y no como utilidad de Tailwind: la version con @utility
+ * generaba la animacion pero se comia el @media anidado, y la cancha
+ * seguia pulsando con "reducir movimiento" activado.
+ */
+.cancha-clickeable:hover {
+  animation: cancha-press 260ms cubic-bezier(0.3, 0.7, 0.4, 1) 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cancha-clickeable:hover {
+    animation: none;
+  }
+}
+
 /* Hatcheo tenue de las zonas no interactivas (predio, estacionamiento). */
 @utility bg-hatch-zone {
   background: repeating-linear-gradient(

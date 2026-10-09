@@ -135,15 +135,18 @@ export function CourtTile({
       }`}
       onClick={() => onSeleccionar(cancha.id)}
       className={cn(
-        'relative flex items-center justify-center overflow-hidden rounded-[10px] border border-cream/20 transition duration-150',
+        'relative flex origin-center items-center justify-center overflow-hidden rounded-[10px] border border-cream/20',
         medidas.clase,
         desktop && 'min-w-0 flex-1',
         ocupada
-          ? 'cursor-not-allowed bg-occupied text-cream/25 opacity-55'
+          ? // Sin turnos libres: no se clickea, asi que tampoco se anima.
+            'cursor-not-allowed bg-occupied text-cream/25 opacity-55'
           : cn(
-              'cursor-pointer active:scale-[0.94]',
+              // La sombra en reposo es la misma con la que arranca y
+              // termina el pulso: la animacion no "aparece" de la nada.
+              // cancha-clickeable: el pulso al pasar el mouse (index.css).
+              'cancha-clickeable cursor-pointer shadow-[0_6px_14px_rgba(0,0,0,0.35)] active:scale-[0.94]',
               PALETA[cancha.nivel].tarjeta,
-              desktop && 'hover:-translate-y-[3px] hover:shadow-[0_10px_20px_rgba(0,0,0,0.35)] active:scale-100',
             ),
         seleccionada && 'outline-2 outline-offset-2 outline-orange',
         className,
