@@ -1,12 +1,16 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
-type Variante = 'primaria' | 'secundaria' | 'fantasma';
+type Variante = 'primaria' | 'secundaria' | 'fantasma' | 'burbuja';
 
 const VARIANTES: Record<Variante, string> = {
   primaria: 'bg-orange text-ink hover:brightness-110',
   secundaria: 'border border-cream/15 bg-cream/5 text-cream hover:bg-cream/10',
   fantasma: 'text-cream-dim hover:text-cream',
+  // Burbuja: sin relleno solido, bien redondeada. Para acciones
+  // secundarias que acompañan a un control sin competir con el.
+  burbuja:
+    'rounded-full border border-cream/15 bg-cream/[0.04] text-cream-dim hover:border-orange/40 hover:bg-orange/10 hover:text-cream',
 };
 
 export function Boton({

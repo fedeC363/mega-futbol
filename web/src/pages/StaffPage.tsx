@@ -112,8 +112,8 @@ export function StaffPage() {
           {/* Siempre ocupa su lugar, aunque no se vea: si apareciera y
               desapareciera, el selector de fecha saltaría de posición. */}
           <Boton
-            variante="fantasma"
-            className={cn('px-2 py-2 text-[13px]', fecha === hoyBA() && 'invisible')}
+            variante="burbuja"
+            className={cn('px-3.5 py-2 text-[13px]', fecha === hoyBA() && 'invisible')}
             aria-hidden={fecha === hoyBA()}
             tabIndex={fecha === hoyBA() ? -1 : undefined}
             onClick={() => setFecha(hoyBA())}
