@@ -107,8 +107,11 @@ export function EstadisticasPage() {
 
   const e = datos.data;
 
-  // Ranking: de la que más se alquiló a la que menos.
+  // Ranking: de la que más se alquiló a la que menos. Las que no se
+  // alquilaron nunca quedan afuera: una barra en cero no dice nada y
+  // deja medio gráfico vacío.
   const ranking = [...(e?.por_cancha ?? [])]
+    .filter((c) => c.cantidad > 0)
     .sort((a, b) => b.cantidad - a.cantidad || a.numero - b.numero)
     .map((c) => ({
       etiqueta: `${c.numero} · ${tipoDeCancha(c.capacidad)}`,
@@ -147,7 +150,11 @@ export function EstadisticasPage() {
 
           <Seccion
             titulo="Canchas más alquiladas"
-            detalle="Cada cancha con su cantidad de reservas, de la más pedida a la que menos."
+            detalle={
+              ranking.length < (e.por_cancha?.length ?? 0)
+                ? `De la más pedida a la que menos. ${(e.por_cancha?.length ?? 0) - ranking.length} canchas todavía no tuvieron reservas y no figuran.`
+                : 'De la más pedida a la que menos.'
+            }
           >
             <ResponsiveContainer width="100%" height={ranking.length * 26 + 30}>
               <BarChart data={ranking} layout="vertical" margin={{ top: 4, right: 40, bottom: 4, left: 4 }}>

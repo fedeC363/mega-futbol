@@ -93,9 +93,10 @@ PANEL DE ADMIN (solo rol admin)
 
 3. Ver las ESTADISTICAS del predio, en una pestaña aparte del menu
    (estadisticas_del_predio). Tres graficos:
-   - Canchas mas alquiladas: barras horizontales con las 20 canchas,
-     ordenadas de la mas pedida a la que menos. Aparecen todas, incluso
-     las que no tuvieron ninguna reserva.
+   - Canchas mas alquiladas: barras horizontales ordenadas de la mas
+     pedida a la que menos. Solo figuran las canchas con al menos una
+     reserva (una barra en cero no dice nada y deja el grafico vacio);
+     debajo del titulo se aclara cuantas quedaron afuera.
    - Tipo de cancha mas alquilado: torta agrupada por capacidad
      (futbol 5, 6, 7 u 8).
    - Horarios mas frecuentes: torta por franja horaria (mañana 08-12,

@@ -251,7 +251,8 @@ IMMUTABLE.
     returns jsonb
     - Los tres resumenes del panel de estadisticas (ver spec 04), en
       una sola consulta: por_cancha (las 20, incluso las que no
-      tuvieron reservas, para que el ranking este completo), por_tipo
+      tuvieron reservas; el grafico esconde esas filas pero el dato
+      sirve para saber cuantas son), por_tipo
       (agrupado por capacidad) y por_franja (mañana, mediodia, tarde,
       noche), mas el total.
     - Cuenta solo 'confirmada' y 'completada': una cancelada no se
