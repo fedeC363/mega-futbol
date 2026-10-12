@@ -239,7 +239,25 @@ IMMUTABLE.
       70% rojo). Con un solo numero, una cancha sin reservas se veria
       llena al final del dia solo porque sus turnos ya pasaron.
 
-16) borrar_reservas_vencidas()
+16) liberar_reservas_sin_confirmar()
+    returns int (cuantas libero)
+    - La ejecuta el cron (ver TAREAS PROGRAMADAS). Borra las reservas
+      que quedaron en 'pendiente_pago' mas de horas_para_confirmar (24
+      por defecto) sin que ningun empleado confirmara la seña, y asi el
+      turno vuelve a estar disponible.
+    - Sin sesion corre libre; con sesion, solo un admin.
+
+17) estadisticas_del_predio(p_sede_id uuid)   -- SOLO ADMIN
+    returns jsonb
+    - Los tres resumenes del panel de estadisticas (ver spec 04), en
+      una sola consulta: por_cancha (las 20, incluso las que no
+      tuvieron reservas, para que el ranking este completo), por_tipo
+      (agrupado por capacidad) y por_franja (mañana, mediodia, tarde,
+      noche), mas el total.
+    - Cuenta solo 'confirmada' y 'completada': una cancelada no se
+      alquilo y una 'pendiente_pago' todavia no esta cerrada.
+
+18) borrar_reservas_vencidas()
     returns int (cuantas borro)
     - La ejecuta el cron (ver TAREAS PROGRAMADAS). Sin sesion corre
       libre; con sesion, solo un admin, porque no es una tarea
@@ -258,6 +276,12 @@ TAREAS PROGRAMADAS (pg_cron)
 --------------------------------
 Corren dentro de la base, no hace falta un servicio aparte. pg_cron
 programa en UTC.
+
+- liberar-reservas-sin-confirmar, cada 15 minutos: ejecuta
+  liberar_reservas_sin_confirmar(), que borra las reservas que llevan
+  mas de horas_para_confirmar (24) en 'pendiente_pago'. Corre seguido y
+  no una vez por dia para que el turno se libere apenas vence el plazo
+  y no al dia siguiente; es un delete sobre un indice, no pesa.
 
 - borrar-reservas-vencidas, todos los dias 04:15 UTC (01:15 en Buenos
   Aires, despues del ultimo turno): ejecuta

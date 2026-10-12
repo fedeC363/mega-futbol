@@ -144,6 +144,9 @@ los edita.
 - dias_retencion_reservas   int, not null, default 15
                               -- dias que se conserva una reserva
                                  despues de que termino el turno
+- horas_para_confirmar      int, not null, default 24
+                              -- horas que una reserva aguanta en
+                                 pendiente_pago antes de liberarse sola
 - inasistencias_aviso       int, not null, default 2
 - inasistencias_suspension  int, not null, default 5
 - meses_suspension          int, not null, default 2
@@ -181,11 +184,13 @@ NOTAS DE DISENO
   despues. Asi, si cambia el precio_base de una cancha mas adelante,
   las reservas viejas no se ven afectadas.
 
-- El estado 'pendiente_pago' deberia expirar solo despues de un tiempo
-  razonable si no hay pago confirmado (sugerido: 15 minutos), liberando
-  el turno. Esto tiene sentido implementarlo junto con la Fase 2 (pago
-  real), por ejemplo con un cron de Supabase (pg_cron o una Edge
-  Function programada) que cancele las reservas vencidas.
+- El estado 'pendiente_pago' expira solo: si pasan 24 horas
+  (configuracion.horas_para_confirmar) sin que ningun empleado confirme
+  la seña, la reserva SE BORRA y el turno vuelve a estar disponible. Lo
+  hace un cron cada 15 minutos (ver spec 02, TAREAS PROGRAMADAS).
+  Se borra y no se cancela: una cancelada quedo registrada porque
+  alguien decidio cancelarla y hubo o no devolucion de seña; acá la
+  reserva nunca se concreto.
 
 - Todas las fechas y horas se guardan y se comparan asumiendo
   America/Argentina/Buenos_Aires (ver spec 00, regla 12). Configurar el

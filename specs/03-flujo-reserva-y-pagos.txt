@@ -28,8 +28,12 @@ FASE 1 - FLUJO VIGENTE: seña por transferencia, confirmada por el staff
 
    La reserva se crea en estado 'pendiente_pago' y se muestra en la
    agenda del staff (la policy de SELECT de reserva ya contempla a los
-   empleados de la sede, sin importar el estado). No hay logica de
-   expiracion: la confirmacion es manual y el staff puede tardar.
+   empleados de la sede, sin importar el estado).
+
+   Tiene 24 horas de vida: si en ese plazo ningun empleado confirma que
+   llego la seña, la reserva se borra y el turno queda libre otra vez
+   (ver spec 02, TAREAS PROGRAMADAS). El plazo es largo a proposito,
+   porque la confirmacion la hace una persona y puede tardar.
 
    El modelo quedo preparado para que, si algun dia se retoma el pago
    real, alcance con agregar el paso de pago en el medio sin reescribir
@@ -76,13 +80,10 @@ el flujo real y definitivo.
 10. La misma Edge Function (o una aparte) envia el comprobante de pago
     al Gmail del usuario.
 
-11. Si el usuario no paga dentro de un tiempo razonable (sugerido: 15
-    minutos), la reserva deberia pasar a 'cancelada' automaticamente
-    para liberar el turno. Implementarlo con un cron (pg_cron o una
-    Edge Function programada con Supabase Scheduled Functions) que
-    revise las reservas 'pendiente_pago' vencidas. Esto recien tiene
-    sentido junto con los pasos 8-10, no antes: en el MVP la
-    confirmacion es manual y el staff puede tardar mas de 15 minutos.
+11. La liberacion de las reservas sin confirmar YA EXISTE y no espera a
+    esta fase: son 24 horas, ver el paso 4. Si algun dia se integra el
+    pago real, lo unico a decidir es si ese plazo se acorta cuando el
+    pago es instantaneo; la tarea programada y el parametro ya estan.
 
 CANCELACION (aplica en todas las fases)
 --------------------------------------------

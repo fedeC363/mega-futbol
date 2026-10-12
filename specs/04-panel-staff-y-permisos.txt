@@ -91,6 +91,24 @@ PANEL DE ADMIN (solo rol admin)
    turno, hora y porcentaje del recargo, monto de la seña, tope de
    reservas activas y dias de anticipacion (actualizar_configuracion).
 
+3. Ver las ESTADISTICAS del predio, en una pestaña aparte del menu
+   (estadisticas_del_predio). Tres graficos:
+   - Canchas mas alquiladas: barras horizontales con las 20 canchas,
+     ordenadas de la mas pedida a la que menos. Aparecen todas, incluso
+     las que no tuvieron ninguna reserva.
+   - Tipo de cancha mas alquilado: torta agrupada por capacidad
+     (futbol 5, 6, 7 u 8).
+   - Horarios mas frecuentes: torta por franja horaria (mañana 08-12,
+     mediodia 12-16, tarde 16-19, noche 19-23).
+
+   Cuentan solo las reservas 'confirmada' y 'completada': una cancelada
+   no se alquilo y una 'pendiente_pago' todavia no esta cerrada.
+
+   OJO CON EL ALCANCE: como las reservas se borran 15 dias despues del
+   turno, esto muestra las ultimas semanas y no todo el historial. Para
+   tener historia larga habria que acumular totales en una tabla aparte
+   antes de que el borrado se lleve las filas.
+
 Cambiar un precio no afecta a las reservas ya hechas: cada una congela
 su precio_total al crearse (spec 01).
 
