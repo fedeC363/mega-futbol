@@ -71,12 +71,16 @@ export function EstadisticasPage() {
   const sede = useCargado(cargarSede, []);
   const sedeId = sede.data?.id;
 
+  // Los hooks corren aunque abajo se devuelva la pantalla de bloqueo,
+  // asi que sin esta condicion cualquier visitante disparaba una
+  // llamada que la base rechaza. La rechazaba bien, pero era un pedido
+  // al pedo y un 401 en la consola.
   const datos = useCargado(async () => {
-    if (!sedeId) return null;
+    if (!sedeId || !esAdmin) return null;
     const { data, error } = await supabase.rpc('estadisticas_del_predio', { p_sede_id: sedeId });
     if (error) throw error;
     return data as unknown as Estadisticas;
-  }, [sedeId]);
+  }, [sedeId, esAdmin]);
 
   if (cargando) {
     return (
