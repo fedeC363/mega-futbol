@@ -1,10 +1,11 @@
+import type { CSSProperties } from 'react';
 import type { CanchaMapa, NivelOcupacion } from '../lib/canchas';
 import { modalidad } from '../lib/canchas';
 import { cn } from '../lib/cn';
 
 /**
  * Colores segun que tan pedida esta la cancha. `tarjeta` pinta el fondo
- * y, via currentColor, las lineas del dibujo.
+ * y, via currentColor, las lineas del dibujo y el circulo central.
  *
  * El badge es naranja sobre el verde, pero blanco sobre el mostaza y el
  * ladrillo: contra esos dos fondos calidos el naranja se pierde.
@@ -30,142 +31,106 @@ const PALETA: Record<NivelOcupacion, { tarjeta: string; badge: string; tipo: str
 };
 
 /**
- * Orientacion de la tarjeta en el mapa. Una cancha es rectangular, asi
- * que la tarjeta tambien: vertical donde la ranura de la grilla es
- * angosta, y la misma proporcion rotada donde es ancha. Nunca cuadrada.
+ * Lineas rectas de la cancha: perimetro, mediocampo y las dos areas.
+ *
+ * El viewBox se estira al tamaño de la tarjeta (preserveAspectRatio
+ * none), pero vector-effect mantiene el grosor del trazo parejo en
+ * canchas anchas y angostas por igual. El circulo central NO va acá:
+ * estirado seria una elipse. Lo dibuja el componente con un elemento
+ * cuadrado aparte.
  */
-export type Orientacion = 'vertical' | 'horizontal';
-
-const MEDIDAS: Record<Orientacion, { ancho: number; alto: number; clase: string }> = {
-  vertical: { ancho: 100, alto: 150, clase: 'aspect-[2/3]' },
-  horizontal: { ancho: 150, alto: 100, clase: 'aspect-[3/2]' },
-};
-
-/**
- * Lineas de una cancha vista desde arriba: perimetro, mediocampo,
- * circulo central con su punto y las dos areas.
- *
- * El mediocampo siempre cruza el lado corto y las areas van en los dos
- * extremos largos, igual que en una cancha de verdad: al rotar la
- * tarjeta rota el dibujo, no se estira.
- *
- * El viewBox tiene la misma proporcion que la tarjeta, asi que
- * preserveAspectRatio="none" llena el espacio sin deformar nada y el
- * circulo central sigue siendo un circulo.
- *
- * El color sale de currentColor: el estado ocupado solo cambia una
- * clase de texto.
- */
-function DibujoDeCancha({ ancho, alto, vertical }: { ancho: number; alto: number; vertical: boolean }) {
-  const menor = Math.min(ancho, alto);
-  const margen = menor * 0.07;
-  const trazo = menor * 0.022;
-  const radio = menor * 0.19;
-  // El area es ancha en el sentido del arco y poco profunda hacia adentro.
-  const largo = (vertical ? ancho : alto) * 0.5;
-  const profundidad = (vertical ? alto : ancho) * 0.12;
-
+function LineasDeCancha({ horizontal }: { horizontal: boolean }) {
   return (
     <svg
-      viewBox={`0 0 ${ancho} ${alto}`}
+      viewBox="0 0 100 100"
       preserveAspectRatio="none"
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 size-full"
     >
-      <g fill="none" stroke="currentColor" strokeWidth={trazo}>
-        <rect
-          x={margen}
-          y={margen}
-          width={ancho - margen * 2}
-          height={alto - margen * 2}
-          rx={menor * 0.03}
-        />
-
-        {vertical ? (
+      <g fill="none" stroke="currentColor" strokeWidth={2} vectorEffect="non-scaling-stroke">
+        {horizontal ? (
           <>
-            <line x1={margen} y1={alto / 2} x2={ancho - margen} y2={alto / 2} />
-            <rect x={(ancho - largo) / 2} y={margen} width={largo} height={profundidad} />
-            <rect x={(ancho - largo) / 2} y={alto - margen - profundidad} width={largo} height={profundidad} />
+            <rect x={4} y={6} width={92} height={88} rx={2} />
+            <line x1={50} y1={6} x2={50} y2={94} />
+            <rect x={4} y={28} width={12} height={44} />
+            <rect x={84} y={28} width={12} height={44} />
           </>
         ) : (
           <>
-            <line x1={ancho / 2} y1={margen} x2={ancho / 2} y2={alto - margen} />
-            <rect x={margen} y={(alto - largo) / 2} width={profundidad} height={largo} />
-            <rect x={ancho - margen - profundidad} y={(alto - largo) / 2} width={profundidad} height={largo} />
+            <rect x={6} y={4} width={88} height={92} rx={2} />
+            <line x1={6} y1={50} x2={94} y2={50} />
+            <rect x={28} y={4} width={44} height={11} />
+            <rect x={28} y={85} width={44} height={11} />
           </>
         )}
-
-        <circle cx={ancho / 2} cy={alto / 2} r={radio} />
-        <circle cx={ancho / 2} cy={alto / 2} r={trazo * 1.4} fill="currentColor" stroke="none" />
       </g>
     </svg>
   );
 }
 
 /**
- * Una cancha del mapa (spec de frontend 2.2). Muestra numero + tipo en el
- * badge, no la capacidad, para no confundir jugadores con modalidad.
+ * Una cancha del mapa (spec de frontend 2.2). Muestra numero + tipo en
+ * el badge, no la capacidad, para no confundir jugadores con modalidad.
+ *
+ * No decide ni su tamaño ni su lugar: los recibe en `style` desde el
+ * layout del predio (src/config/layoutSanJusto.ts).
  */
 export function CourtTile({
   cancha,
-  variante,
-  orientacion = 'vertical',
-  seleccionada,
+  horizontal,
+  style,
   onSeleccionar,
-  className,
 }: {
   cancha: CanchaMapa;
-  variante: 'mobile' | 'desktop';
-  orientacion?: Orientacion;
-  seleccionada: boolean;
+  horizontal: boolean;
+  style: CSSProperties;
   onSeleccionar: (id: string) => void;
-  className?: string;
 }) {
   const { ocupada } = cancha;
-  const desktop = variante === 'desktop';
-  const medidas = MEDIDAS[orientacion];
 
   return (
     <button
       type="button"
       disabled={ocupada}
-      aria-pressed={seleccionada}
+      style={style}
       aria-label={`Cancha ${cancha.numero}, ${modalidad(cancha.tipo)}, ${
         ocupada ? 'sin turnos libres' : `${cancha.porcentaje}% ocupada, disponible`
       }`}
       onClick={() => onSeleccionar(cancha.id)}
       className={cn(
-        'relative flex origin-center items-center justify-center overflow-hidden rounded-[10px] border border-cream/20',
-        medidas.clase,
-        desktop && 'min-w-0 flex-1',
+        'absolute flex origin-center items-center justify-center overflow-hidden rounded-[10px] border border-cream/15',
         ocupada
           ? // Sin turnos libres: no se clickea, asi que tampoco se anima.
-            'cursor-not-allowed bg-occupied text-cream/25 opacity-55'
+            'cursor-not-allowed bg-occupied text-cream/25 opacity-60'
           : cn(
               // La sombra en reposo es la misma con la que arranca y
-              // termina el pulso: la animacion no "aparece" de la nada.
-              // cancha-clickeable: el pulso al pasar el mouse (index.css).
+              // termina el pulso del hover (ver cancha-clickeable).
               'cancha-clickeable cursor-pointer shadow-[0_6px_14px_rgba(0,0,0,0.35)] active:scale-[0.94]',
               PALETA[cancha.nivel].tarjeta,
             ),
-        seleccionada && 'outline-2 outline-offset-2 outline-orange',
-        className,
       )}
     >
-      <DibujoDeCancha ancho={medidas.ancho} alto={medidas.alto} vertical={orientacion === 'vertical'} />
+      <LineasDeCancha horizontal={horizontal} />
+
+      {/* Circulo central: cuadrado y redondeado, asi nunca se deforma. */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute top-1/2 left-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-current',
+          horizontal ? 'h-[58%]' : 'w-[62%]',
+        )}
+      />
 
       <span
         className={cn(
-          'relative z-10 min-w-[34px] rounded-lg px-2 pt-[7px] pb-1.5 text-center font-display leading-none font-bold shadow-[0_4px_10px_rgba(0,0,0,0.25)]',
-          desktop ? 'min-w-[38px] px-2.5 pt-2 pb-[7px] text-[15px]' : 'text-sm',
+          'relative z-10 min-w-9 rounded-lg px-2.5 pt-[7px] pb-1.5 text-center font-display text-[17px] leading-none font-bold shadow-[0_4px_10px_rgba(0,0,0,0.25)]',
           ocupada ? 'bg-[#5b675e] text-[#c9d2cb]' : PALETA[cancha.nivel].badge,
         )}
       >
         {cancha.numero}
         <small
           className={cn(
-            'mt-0.5 block font-sans text-[8px] font-medium tracking-[0.3px]',
-            desktop && 'text-[8.5px]',
+            'mt-0.5 block font-sans text-[8.5px] font-medium tracking-[0.3px]',
             ocupada ? 'text-[#8a9990]' : PALETA[cancha.nivel].tipo,
           )}
         >

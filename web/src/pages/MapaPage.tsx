@@ -67,9 +67,9 @@ export function MapaPage() {
       <DateStrip fecha={fecha} onCambiar={setFecha} />
 
       <main className="px-3.5 pt-4 pb-28 md:flex-1 md:overflow-y-auto md:px-8 md:pt-5 md:pb-10">
-        {/* max-w-3xl y no 5xl: con las canchas mas chicas, el pulso del
-            hover se ve mas prolijo y el mapa entra mejor en pantalla. */}
-        <div className="mx-auto w-full max-w-3xl">
+        {/* El ancho del lienzo define el tamaño de las canchas: todo el
+            mapa escala con este numero. */}
+        <div className="mx-auto w-full max-w-4xl">
           <h1 className="sr-only">Reservá una cancha en Mega Fútbol</h1>
           <p className="mx-0.5 mb-2.5 text-[11px] tracking-[1.2px] text-cream-dim uppercase md:mb-3.5">
             Mapa del predio · <span className="md:hidden">tocá</span>
@@ -97,7 +97,6 @@ export function MapaPage() {
           ) : (
             <CourtsMap
               canchas={canchasMapa}
-              seleccionadaId={null}
               onSeleccionar={(id) => navigate(`/cancha/${id}?fecha=${fecha ?? hoyBA()}`)}
             />
           )}

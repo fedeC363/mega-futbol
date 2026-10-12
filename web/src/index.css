@@ -10,6 +10,7 @@
   --color-pitch: #0e1b14;      /* fondo principal */
   --color-pitch-2: #142a1e;    /* header, rail, superficies elevadas */
   --color-panel: #16281d;      /* paneles, tarjetas */
+  --color-predio: #122219;     /* el terreno, detras de las canchas */
   --color-turf: #1f6e43;       /* cancha disponible (base) */
   --color-turf-light: #2c8a56; /* cancha disponible (acento) */
   --color-occupied: #3a473f;   /* cancha sin turnos libres */
