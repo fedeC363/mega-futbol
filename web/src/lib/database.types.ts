@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -99,10 +99,12 @@ export type Database = {
           actualizado_at: string
           actualizado_por: string | null
           dias_anticipacion_max: number
+          dias_retencion_reservas: number
           factor_recargo: number
           hora_primer_turno: string
           hora_recargo_desde: string
           hora_ultimo_turno: string
+          horas_para_confirmar: number
           id: boolean
           inasistencias_aviso: number
           inasistencias_suspension: number
@@ -114,10 +116,12 @@ export type Database = {
           actualizado_at?: string
           actualizado_por?: string | null
           dias_anticipacion_max?: number
+          dias_retencion_reservas?: number
           factor_recargo?: number
           hora_primer_turno?: string
           hora_recargo_desde?: string
           hora_ultimo_turno?: string
+          horas_para_confirmar?: number
           id?: boolean
           inasistencias_aviso?: number
           inasistencias_suspension?: number
@@ -129,10 +133,12 @@ export type Database = {
           actualizado_at?: string
           actualizado_por?: string | null
           dias_anticipacion_max?: number
+          dias_retencion_reservas?: number
           factor_recargo?: number
           hora_primer_turno?: string
           hora_recargo_desde?: string
           hora_ultimo_turno?: string
+          horas_para_confirmar?: number
           id?: boolean
           inasistencias_aviso?: number
           inasistencias_suspension?: number
@@ -424,10 +430,12 @@ export type Database = {
           actualizado_at: string
           actualizado_por: string | null
           dias_anticipacion_max: number
+          dias_retencion_reservas: number
           factor_recargo: number
           hora_primer_turno: string
           hora_recargo_desde: string
           hora_ultimo_turno: string
+          horas_para_confirmar: number
           id: boolean
           inasistencias_aviso: number
           inasistencias_suspension: number
@@ -467,6 +475,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      borrar_reservas_vencidas: { Args: never; Returns: number }
       cancelar_reserva: {
         Args: { p_reserva_id: string; p_sena_devuelta: boolean }
         Returns: undefined
@@ -517,11 +526,13 @@ export type Database = {
         Args: { p_cancha_id: string; p_fecha: string }
         Returns: boolean
       }
+      estadisticas_del_predio: { Args: { p_sede_id: string }; Returns: Json }
       factor_recargo: { Args: never; Returns: number }
       hora_primer_turno: { Args: never; Returns: string }
       hora_recargo_desde: { Args: never; Returns: string }
       hora_ultimo_turno: { Args: never; Returns: string }
       levantar_sancion: { Args: { p_usuario_id: string }; Returns: undefined }
+      liberar_reservas_sin_confirmar: { Args: never; Returns: number }
       marcar_inasistencia: {
         Args: { p_reserva_id: string }
         Returns: undefined
