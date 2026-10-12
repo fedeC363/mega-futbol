@@ -34,8 +34,13 @@ export function SideMenu() {
     { icono: '💬', etiqueta: 'Contacto y redes', to: '/contacto' },
     // Solo para quien tiene una fila activa en empleado.
     ...(empleado ? [{ icono: '🗂️', etiqueta: 'Panel de staff', to: '/staff' }] : []),
-    // Precios y configuracion: solo rol admin.
-    ...(esAdmin ? [{ icono: '⚙️', etiqueta: 'Panel de admin', to: '/admin' }] : []),
+    // Precios, configuracion y numeros: solo rol admin.
+    ...(esAdmin
+      ? [
+          { icono: '⚙️', etiqueta: 'Panel de admin', to: '/admin' },
+          { icono: '📊', etiqueta: 'Estadísticas', to: '/estadisticas' },
+        ]
+      : []),
   ];
 
   return (
