@@ -3,34 +3,46 @@ import { TIPOS, type CanchaMapa } from '../lib/canchas';
 import { pesos } from '../lib/formato';
 
 /**
- * Las dos leyendas del mapa, separadas por lo que explica cada una:
- * arriba que significa el color de una cancha, y abajo (pegado al
- * mapa) cuanto sale cada tipo. Antes iban mezcladas en una sola fila y
- * no se entendia que los primeros cuatro chips y los ultimos cuatro
- * hablaban de cosas distintas.
+ * Una fila de filtros del mapa: etiqueta a la izquierda, contenido a la
+ * derecha.
+ *
+ * La columna de la etiqueta tiene ancho fijo, asi que las tres filas
+ * (ocupacion, precios y fecha) arrancan sus chips en la misma linea
+ * vertical. En pantallas angostas la etiqueta pasa arriba, pero el
+ * borde izquierdo sigue siendo el mismo.
  */
+export function FilaDeFiltro({ etiqueta, children }: { etiqueta: string; children: ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 gap-1.5 md:grid-cols-[150px_1fr] md:items-center md:gap-3">
+      <p className="text-[11px] tracking-[1.2px] text-cream-dim uppercase">{etiqueta}</p>
+      {children}
+    </div>
+  );
+}
 
 /** Que significa el color de cada cancha, segun su ocupacion del dia. */
 export function LeyendaOcupacion() {
   return (
-    <Fila etiqueta="Ocupación del día" className="px-[18px] pt-3.5 md:px-8">
-      <Chip>
-        <Muestra className="bg-turf" />
-        Hasta 30%
-      </Chip>
-      <Chip>
-        <Muestra className="bg-mostaza" />
-        30 a 70%
-      </Chip>
-      <Chip>
-        <Muestra className="bg-ladrillo" />
-        Más de 70%
-      </Chip>
-      <Chip>
-        <Muestra className="bg-occupied" />
-        Completa
-      </Chip>
-    </Fila>
+    <FilaDeFiltro etiqueta="Ocupación del día">
+      <div className="flex flex-wrap gap-2">
+        <Chip>
+          <Muestra className="bg-turf" />
+          Hasta 30%
+        </Chip>
+        <Chip>
+          <Muestra className="bg-mostaza" />
+          30 a 70%
+        </Chip>
+        <Chip>
+          <Muestra className="bg-ladrillo" />
+          Más de 70%
+        </Chip>
+        <Chip>
+          <Muestra className="bg-occupied" />
+          Completa
+        </Chip>
+      </div>
+    </FilaDeFiltro>
   );
 }
 
@@ -44,30 +56,15 @@ export function LeyendaPrecios({ canchas }: { canchas: CanchaMapa[] }) {
   if (precios.length === 0) return null;
 
   return (
-    <Fila etiqueta="Precio por turno">
-      {precios.map(({ tipo, precio }) => (
-        <Chip key={tipo}>
-          {tipo} <b className="font-semibold text-cream">{pesos(precio)}</b>
-        </Chip>
-      ))}
-    </Fila>
-  );
-}
-
-function Fila({
-  etiqueta,
-  className,
-  children,
-}: {
-  etiqueta: string;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className={`flex items-center gap-2 overflow-x-auto scrollbar-none md:gap-2.5 ${className ?? ''}`}>
-      <span className="shrink-0 text-[11px] tracking-[1.2px] text-cream-dim uppercase">{etiqueta}</span>
-      {children}
-    </div>
+    <FilaDeFiltro etiqueta="Precio por turno">
+      <div className="flex flex-wrap gap-2">
+        {precios.map(({ tipo, precio }) => (
+          <Chip key={tipo}>
+            {tipo} <b className="font-semibold text-cream">{pesos(precio)}</b>
+          </Chip>
+        ))}
+      </div>
+    </FilaDeFiltro>
   );
 }
 

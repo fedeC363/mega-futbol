@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CourtsMap } from '../components/CourtsMap';
 import { DateStrip } from '../components/DateStrip';
-import { LeyendaOcupacion, LeyendaPrecios } from '../components/Leyendas';
+import { FilaDeFiltro, LeyendaOcupacion, LeyendaPrecios } from '../components/Leyendas';
 import { Aviso, Cargando } from '../components/ui';
 import { useCargado } from '../hooks/useCargado';
 import { nivelDeOcupacion, tipoDeCancha, type CanchaMapa } from '../lib/canchas';
@@ -63,25 +63,26 @@ export function MapaPage() {
 
   return (
     <div className="flex flex-1 flex-col md:min-h-0">
-      <LeyendaOcupacion />
-
       <main className="px-3.5 pt-4 pb-28 md:flex-1 md:overflow-y-auto md:px-8 md:pt-5 md:pb-10">
         {/* El ancho del lienzo define el tamaño de las canchas: todo el
             mapa escala con este numero. */}
         <div className="mx-auto w-full max-w-4xl">
           <h1 className="sr-only">Reservá una cancha en Mega Fútbol</h1>
-          <p className="mx-0.5 mb-2.5 text-[11px] tracking-[1.2px] text-cream-dim uppercase md:mb-3">
+          {/* Los filtros, como un bloque aparte del mapa: las tres filas
+              comparten borde izquierdo y alinean sus chips entre sí. */}
+          <div className="mb-7 grid gap-3.5">
+            <LeyendaOcupacion />
+            <LeyendaPrecios canchas={canchasMapa} />
+            <FilaDeFiltro etiqueta="Fecha">
+              <DateStrip fecha={fecha} onCambiar={setFecha} className="" />
+            </FilaDeFiltro>
+          </div>
+
+          {/* Encabezado del mapa: va pegado al mapa, no al bloque de filtros. */}
+          <p className="mb-2.5 text-[11px] tracking-[1.2px] text-cream-dim uppercase">
             Mapa del predio · <span className="md:hidden">tocá</span>
             <span className="hidden md:inline">hacé click en</span> una cancha para reservar
           </p>
-
-          {/* Pegada al mapa: explica el F5/F6/F7/F8 del badge de cada cancha. */}
-          <div className="mb-3">
-            <LeyendaPrecios canchas={canchasMapa} />
-          </div>
-
-          {/* Último antes del mapa: elegís el día y mirás las canchas. */}
-          <DateStrip fecha={fecha} onCambiar={setFecha} className="mb-3.5" />
 
           {error && (
             <div className="mb-3">
