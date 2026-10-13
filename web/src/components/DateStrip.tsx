@@ -10,10 +10,14 @@ export function DateStrip({
   fecha,
   onCambiar,
   dias = 7,
+  // Por defecto se ubica como una barra de la pagina; quien la mete
+  // adentro de un contenedor le pasa su propio espaciado.
+  className = 'px-3.5 pt-3.5 md:px-8 md:pt-5',
 }: {
   fecha: string | null;
   onCambiar: (fecha: string) => void;
   dias?: number;
+  className?: string;
 }) {
   const hoy = hoyBA();
   const lista = Array.from({ length: dias }, (_, i) => sumarDias(hoy, i));
@@ -22,7 +26,7 @@ export function DateStrip({
     <div
       role="radiogroup"
       aria-label="Elegí el día"
-      className="flex gap-2 overflow-x-auto px-3.5 pt-3.5 scrollbar-none md:px-8 md:pt-5"
+      className={cn('flex gap-2 overflow-x-auto scrollbar-none', className)}
     >
       {lista.map((f) => {
         const { dia, numero } = etiquetaDia(f);

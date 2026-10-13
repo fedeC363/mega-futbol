@@ -64,7 +64,6 @@ export function MapaPage() {
   return (
     <div className="flex flex-1 flex-col md:min-h-0">
       <LeyendaOcupacion />
-      <DateStrip fecha={fecha} onCambiar={setFecha} />
 
       <main className="px-3.5 pt-4 pb-28 md:flex-1 md:overflow-y-auto md:px-8 md:pt-5 md:pb-10">
         {/* El ancho del lienzo define el tamaño de las canchas: todo el
@@ -80,6 +79,9 @@ export function MapaPage() {
           <div className="mb-3">
             <LeyendaPrecios canchas={canchasMapa} />
           </div>
+
+          {/* Último antes del mapa: elegís el día y mirás las canchas. */}
+          <DateStrip fecha={fecha} onCambiar={setFecha} className="mb-3.5" />
 
           {error && (
             <div className="mb-3">
