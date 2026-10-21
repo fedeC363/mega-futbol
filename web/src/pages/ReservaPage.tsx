@@ -6,6 +6,7 @@ import { DateStrip } from '../components/DateStrip';
 import { Aviso, Boton, Cargando } from '../components/ui';
 import { useCargado } from '../hooks/useCargado';
 import { modalidad, tipoDeCancha } from '../lib/canchas';
+import { cn } from '../lib/cn';
 import { ALIAS_TRANSFERENCIA, WHATSAPP_NUMERO, whatsappUrl } from '../lib/contacto';
 import { cargarCancha, cargarDisponibilidad, cargarParametros, horaEntera, porcentajeRecargo } from '../lib/datos';
 import { mensajeDeError } from '../lib/errores';
@@ -154,11 +155,7 @@ export function ReservaPage() {
           )}
 
           {turnos.data && (
-            <div
-              role="radiogroup"
-              aria-label="Horarios"
-              className="menu-chico mt-4 grid grid-cols-3 gap-1.5 sm:grid-cols-5"
-            >
+            <div role="radiogroup" aria-label="Horarios" className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
               {turnos.data.map((t) => (
                 <button
                   key={t.hora_inicio}
@@ -168,10 +165,13 @@ export function ReservaPage() {
                   aria-label={`${horaCorta(t.hora_inicio)}, ${t.ocupado ? 'no disponible' : pesos(t.precio)}`}
                   disabled={t.ocupado}
                   onClick={() => cambiarParams({ hora: t.hora_inicio })}
-                  className="opcion-menu py-2.5 text-center"
+                  className={cn(
+                    'rounded-lg border border-cream/12 bg-cream/5 py-2.5 text-center',
+                    t.ocupado ? 'cursor-not-allowed line-through opacity-30' : 'hover:border-orange',
+                  )}
                 >
                   <span className="block text-[13px] font-medium">{horaCorta(t.hora_inicio)}</span>
-                  <span className="mt-0.5 block text-[11px] text-cream/75">{pesos(t.precio)}</span>
+                  <span className="mt-0.5 block text-[11px] text-cream-dim">{pesos(t.precio)}</span>
                 </button>
               ))}
             </div>

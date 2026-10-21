@@ -26,7 +26,7 @@ export function DateStrip({
     <div
       role="radiogroup"
       aria-label="Elegí el día"
-      className={cn('menu-chico flex gap-1.5 overflow-x-auto scrollbar-none', className)}
+      className={cn('flex gap-2 overflow-x-auto scrollbar-none', className)}
     >
       {lista.map((f) => {
         const { dia, numero } = etiquetaDia(f);
@@ -39,7 +39,12 @@ export function DateStrip({
             aria-checked={activo}
             aria-label={`${dia} ${numero}`}
             onClick={() => onCambiar(f)}
-            className="opcion-menu flex min-w-[58px] shrink-0 flex-col items-center px-3 py-1.5"
+            className={cn(
+              'flex min-w-[58px] shrink-0 flex-col items-center rounded-[10px] border px-3 py-1.5 transition',
+              activo
+                ? 'border-orange bg-orange text-ink'
+                : 'border-cream/10 bg-panel text-cream-dim hover:text-cream',
+            )}
           >
             <span className="text-[11px] font-medium tracking-wide uppercase">{dia}</span>
             <span className="font-display text-lg leading-tight font-bold">{numero}</span>

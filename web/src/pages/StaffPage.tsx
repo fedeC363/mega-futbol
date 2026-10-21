@@ -128,9 +128,7 @@ export function StaffPage() {
             value={fecha}
             onChange={(e) => e.target.value && setFecha(e.target.value)}
             aria-label="Fecha"
-            // color-scheme light: sobre el naranja, el icono del
-            // calendario tiene que dibujarse oscuro para verse.
-            className="rounded-xl border border-transparent bg-orange px-3 py-2 text-[14px] text-ink [color-scheme:light]"
+            className="rounded-xl border border-cream/15 bg-cream/5 px-3 py-2 text-[14px] text-cream"
           />
           <Boton variante="secundaria" className="px-3 py-2" aria-label="Día siguiente" onClick={() => setFecha(sumarDias(fecha, 1))}>
             ›
@@ -147,7 +145,7 @@ export function StaffPage() {
         ))}
       </div>
 
-      <div role="radiogroup" aria-label="Filtrar por estado" className="menu-chico mb-4 flex flex-wrap gap-1.5">
+      <div role="radiogroup" aria-label="Filtrar por estado" className="mb-4 flex flex-wrap gap-2">
         {FILTROS.map((f) => {
           const cantidad = f.clave === 'todos' ? filas.length : filas.filter((r) => r.estado === f.clave).length;
           const activo = filtro === f.clave;
@@ -158,9 +156,14 @@ export function StaffPage() {
               role="radio"
               aria-checked={activo}
               onClick={() => setFiltro(f.clave)}
-              className="opcion-menu px-3.5 py-1.5 text-[13px]"
+              className={cn(
+                'rounded-full border px-3.5 py-1.5 text-[13px] transition',
+                activo
+                  ? 'border-orange bg-orange font-semibold text-ink'
+                  : 'border-cream/12 bg-panel text-cream-dim hover:text-cream',
+              )}
             >
-              {f.etiqueta} <span className="text-cream/70">{cantidad}</span>
+              {f.etiqueta} <span className={activo ? 'text-ink/70' : 'text-cream-dim'}>{cantidad}</span>
             </button>
           );
         })}

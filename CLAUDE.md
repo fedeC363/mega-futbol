@@ -42,14 +42,6 @@ improvisar el diseño.
 La identidad de marca ya definida: colores naranja, verde y negro. La
 página principal es un mapa minimalista del predio con las canchas.
 
-**Menús chicos de selección** (fecha, hora, filtros de estado, solapas):
-el contenedor va **naranja** y las opciones adentro **verdes**. Las
-clases están en `web/src/index.css` (`.menu-chico` y `.opcion-menu`):
-usalas en cualquier selector nuevo de ese estilo en vez de inventar
-colores. Como el naranja pasó a ser el fondo, la opción elegida se
-marca con verde más claro, un aro crema y negrita — no alcanza con el
-color para distinguirla.
-
 ## Reglas de negocio clave (resumen — el detalle está en los specs)
 
 - Seña fija: $15.000 ARS. El usuario la transfiere por fuera del
