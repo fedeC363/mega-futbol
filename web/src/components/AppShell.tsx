@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { SideMenu } from './SideMenu';
+import { Terminos } from './Terminos';
 
 /**
  * Estructura comun (spec de frontend, seccion 2):
@@ -16,6 +17,10 @@ export function AppShell() {
         <Header />
         <Outlet />
       </div>
+
+      {/* Los términos: el modal cuando hay que aceptarlos y el botón
+          flotante para consultarlos, en todas las pantallas. */}
+      <Terminos />
     </div>
   );
 }

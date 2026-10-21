@@ -19,6 +19,8 @@ interface AuthContexto {
   esAdmin: boolean;
   /** true hasta saber si hay sesion y, si la hay, quien es. */
   cargando: boolean;
+  /** Vuelve a leer la fila de usuario (ej: despues de aceptar los terminos). */
+  recargarPerfil: () => void;
   salir: () => Promise<void>;
 }
 
@@ -30,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [perfil, setPerfil] = useState<Usuario | null>(null);
   const [empleado, setEmpleado] = useState<Empleado | null>(null);
   const [perfilListo, setPerfilListo] = useState(false);
+  const [versionPerfil, setVersionPerfil] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -69,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       vigente = false;
     };
-  }, [userId]);
+  }, [userId, versionPerfil]);
 
   const valor: AuthContexto = {
     session,
@@ -77,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     empleado,
     esAdmin: empleado?.rol === 'admin',
     cargando: !sesionLista || !perfilListo,
+    recargarPerfil: () => setVersionPerfil((v) => v + 1),
     salir: async () => {
       await supabase.auth.signOut();
     },

@@ -1,0 +1,56 @@
+TÉRMINOS Y CONDICIONES DE USO — MEGA FUTBOL
+
+Última actualización: 21/10/2026
+
+1. OBJETO
+Mega Futbol es una plataforma web que permite a los usuarios consultar la disponibilidad y reservar canchas de fútbol en el predio ubicado en San Justo. Al registrarse y/o utilizar la plataforma, el usuario acepta los presentes Términos y Condiciones.
+
+2. REGISTRO DE USUARIOS
+2.1. Para reservar una cancha es necesario crear una cuenta con un correo electrónico y una contraseña.
+2.2. El usuario es responsable de la veracidad de los datos cargados y de mantener la confidencialidad de su contraseña.
+2.3. No se permite registrar más de una cuenta con el mismo correo electrónico.
+
+3. RESERVAS
+3.1. La plataforma muestra las canchas disponibles según el día y horario de apertura y cierre configurados por la administración.
+3.2. Al seleccionar un turno disponible, la reserva queda en estado "pendiente de pago" hasta que el usuario transfiera la seña correspondiente al alias indicado en la plataforma y un miembro del staff confirme manualmente la recepción del pago.
+3.3. Una vez confirmado el pago por el staff, la reserva pasa a estado "confirmada".
+3.4. Si transcurren 24 (veinticuatro) horas desde el momento de la reserva sin que ningún miembro del staff haya confirmado la recepción de la seña, la reserva se elimina automáticamente y el turno vuelve a quedar disponible para cualquier usuario.
+3.5. El monto de la seña, el recargo (si corresponde), el horario de atención y el tope de reservas por usuario son parámetros configurados por la administración y pueden modificarse sin previo aviso individual a los usuarios, aplicando a las reservas futuras.
+
+4. MEDIO DE PAGO
+4.1. Actualmente el único medio de pago habilitado es la transferencia bancaria al alias informado en la plataforma, con confirmación manual por parte del staff. La plataforma no procesa pagos con tarjeta ni pagos automáticos en esta etapa.
+4.2. Es responsabilidad del usuario conservar el comprobante de la transferencia realizada hasta que la reserva sea confirmada.
+
+5. CANCELACIONES
+5.1. Una reserva cancelada no cuenta como inasistencia (no-show) a los fines del sistema de amonestaciones descripto en la cláusula 6.
+
+6. SISTEMA DE AMONESTACIONES POR INASISTENCIA (NO-SHOW)
+6.1. Si un usuario no se presenta a un turno reservado y confirmado, el staff puede marcar manualmente la reserva como "inasistencia" (no-show).
+6.2. Cada inasistencia suma una amonestación a la cuenta del usuario.
+6.3. Al llegar a la segunda amonestación, el sistema muestra un aviso tanto al usuario como al staff.
+6.4. Al llegar a la quinta amonestación, la cuenta del usuario queda suspendida automáticamente por 2 (dos) meses, periodo durante el cual no podrá realizar nuevas reservas.
+6.5. Si, luego de cumplida una suspensión, el usuario acumula 5 (cinco) amonestaciones adicionales, la cuenta queda vetada de forma permanente para realizar reservas.
+6.6. La administración puede, de manera excepcional, levantar una suspensión o veto de forma manual.
+
+7. ROLES Y ADMINISTRACIÓN
+7.1. Existen cuentas de tipo usuario, empleado/staff y administrador, con distintos niveles de acceso dentro de la plataforma.
+7.2. Únicamente la cuenta administradora principal de la plataforma puede designar nuevas cuentas de administrador/empleado.
+7.3. El personal autorizado (staff) tiene acceso a los datos de contacto de los usuarios únicamente para la gestión de las reservas correspondientes al predio en el que trabaja.
+
+8. DISPONIBILIDAD DE CANCHAS
+8.1. La administración puede desactivar una cancha de forma permanente o desactivar canchas específicas para fechas determinadas, sin afectar la disponibilidad del resto de las canchas.
+8.2. Si no hay ninguna cancha activa disponible, la plataforma informará esta situación al usuario.
+
+9. DATOS PERSONALES
+9.1. Los datos cargados por el usuario (nombre, correo electrónico, número de contacto) se utilizan exclusivamente para la gestión de las reservas y la comunicación relacionada con las mismas (incluyendo el aviso de reserva enviado por WhatsApp al predio).
+9.2. El usuario puede solicitar la corrección o eliminación de sus datos contactando a la administración.
+
+10. LIMITACIÓN DE RESPONSABILIDAD
+10.1. Mega Futbol es una plataforma de gestión de reservas y no se responsabiliza por lesiones, daños materiales o conflictos que puedan surgir durante el uso efectivo de las instalaciones.
+10.2. El uso de las instalaciones queda sujeto, además de estos Términos, a las reglas del predio físico ubicado en San Justo.
+
+11. MODIFICACIONES
+Estos Términos y Condiciones pueden ser modificados por la administración en cualquier momento. Los cambios aplicarán a las reservas realizadas con posterioridad a su publicación en la plataforma.
+
+12. ACEPTACIÓN
+El uso de la plataforma Mega Futbol implica la aceptación plena de los presentes Términos y Condiciones.
