@@ -362,6 +362,8 @@ export type Database = {
           suspendido_hasta: string | null
           suspensiones: number
           telefono: string | null
+          terminos_aceptados_at: string | null
+          terminos_version: string | null
           vetado: boolean
         }
         Insert: {
@@ -372,6 +374,8 @@ export type Database = {
           suspendido_hasta?: string | null
           suspensiones?: number
           telefono?: string | null
+          terminos_aceptados_at?: string | null
+          terminos_version?: string | null
           vetado?: boolean
         }
         Update: {
@@ -382,6 +386,8 @@ export type Database = {
           suspendido_hasta?: string | null
           suspensiones?: number
           telefono?: string | null
+          terminos_aceptados_at?: string | null
+          terminos_version?: string | null
           vetado?: boolean
         }
         Relationships: []
@@ -391,6 +397,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      aceptar_terminos: { Args: { p_version?: string }; Returns: undefined }
       actualizar_cancha: {
         Args: {
           p_activa?: boolean
