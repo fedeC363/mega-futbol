@@ -10,6 +10,8 @@ import { MapaPage } from './pages/MapaPage';
 import { PerfilPage } from './pages/PerfilPage';
 import { ReservaPage } from './pages/ReservaPage';
 import { StaffPage } from './pages/StaffPage';
+import { UsuarioPage } from './pages/UsuarioPage';
+import { UsuariosPage } from './pages/UsuariosPage';
 
 // Diferida: arrastra la libreria de graficos y la ve solo el admin.
 const EstadisticasPage = lazy(() =>
@@ -29,6 +31,8 @@ export function App() {
             <Route path="contacto" element={<ContactoPage />} />
             <Route path="staff" element={<StaffPage />} />
             <Route path="admin" element={<AdminPage />} />
+            <Route path="admin/usuarios" element={<UsuariosPage />} />
+            <Route path="admin/usuarios/:usuarioId" element={<UsuarioPage />} />
             <Route
               path="estadisticas"
               element={

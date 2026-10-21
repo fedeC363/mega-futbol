@@ -81,6 +81,22 @@ export function AdminPage() {
       </section>
 
       <section className="mt-8">
+        <h2 className="font-display text-xl leading-none font-bold">Usuarios</h2>
+        <p className="mt-1.5 text-[12px] text-cream-dim">
+          Datos de contacto, reservas y amonestaciones de cada cliente.
+        </p>
+        <Link
+          to="/admin/usuarios"
+          className="mt-3 flex items-center justify-between rounded-xl border border-cream/10 bg-panel px-4 py-3.5 text-[14px] hover:border-cream/25"
+        >
+          Ver el listado de usuarios
+          <span className="text-orange" aria-hidden="true">
+            →
+          </span>
+        </Link>
+      </section>
+
+      <section className="mt-8">
         <h2 className="font-display text-xl leading-none font-bold">Canchas</h2>
         {canchas.error && <Aviso>{canchas.error}</Aviso>}
         {canchas.cargando && !canchas.data && <Cargando />}
