@@ -54,3 +54,7 @@ Estos Términos y Condiciones pueden ser modificados por la administración en c
 
 12. ACEPTACIÓN
 El uso de la plataforma Mega Futbol implica la aceptación plena de los presentes Términos y Condiciones.
+
+13. SOBRE ESTE PROYECTO
+Hola soy Federico Cuda y el objetivo principal de esta página no es para nada lucrar con ella.
+El objetivo es demostrar mi capacidad para desarrollar soluciones a problemas habituales, en este caso, el proceso de reservar una cancha de fútbol debido a que suele demorar por el tiempo de respuesta del personal. Si llegaste hasta acá muchas gracias por haberte metido en mi proyecto. Espero que te guste y si tenés alguna idea para mejorar el proyecto o encontraste un error voy a estar muy agradecido si me lo comunicás.

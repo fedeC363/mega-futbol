@@ -8,6 +8,6 @@ import texto from './terminos.txt?raw';
  * usuario.terminos_version, asi que el dia que haga falta volver a
  * pedir la aceptacion alcanza con comparar contra la vigente.
  */
-export const TERMINOS_VERSION = 'v1';
+export const TERMINOS_VERSION = 'v2';
 
 export const TERMINOS_TEXTO = texto;
