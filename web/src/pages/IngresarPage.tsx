@@ -3,7 +3,6 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { Pagina } from '../components/Pagina';
 import { Aviso, Boton, Campo } from '../components/ui';
-import { cn } from '../lib/cn';
 import { mensajeDeErrorAuth } from '../lib/errores';
 import { supabase } from '../lib/supabase';
 import { validarTelefono } from '../lib/validacion';
@@ -111,7 +110,7 @@ export function IngresarPage() {
       }
       ancho="max-w-md"
     >
-      <div role="tablist" className="mb-5 grid grid-cols-2 gap-1 rounded-xl border border-cream/10 bg-panel p-1">
+      <div role="tablist" className="menu-chico mb-5 grid grid-cols-2 gap-1.5">
         {(['ingresar', 'registro'] as const).map((m) => (
           <button
             key={m}
@@ -122,10 +121,7 @@ export function IngresarPage() {
               setModo(m);
               setError(null);
             }}
-            className={cn(
-              'rounded-lg py-2 text-[13px] font-medium transition',
-              modo === m ? 'bg-orange text-ink' : 'text-cream-dim hover:text-cream',
-            )}
+            className="opcion-menu py-2 text-[13px] font-medium"
           >
             {m === 'ingresar' ? 'Ya tengo cuenta' : 'Soy nuevo'}
           </button>
