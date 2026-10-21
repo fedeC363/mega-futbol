@@ -264,6 +264,30 @@ IMMUTABLE.
       libre; con sesion, solo un admin, porque no es una tarea
       operativa del dia a dia.
 
+19) usuarios_para_admin(p_busqueda text)   -- SOLO ADMIN
+    returns table(id, nombre, telefono, email, inasistencias,
+                  suspensiones, suspendido_hasta, vetado,
+                  reservas_activas, created_at)
+    - El listado de clientes del panel (ver spec 04). Los empleados
+      quedan afuera.
+    - La busqueda (nombre o mail, sin distinguir mayusculas) la hace
+      esta funcion y no el navegador: la lista puede ser larga y el
+      mail no esta en public.usuario.
+    - Ordena primero lo que hay que mirar: vetados, suspendidos y con
+      inasistencias. Devuelve hasta 100.
+
+20) perfil_de_usuario(p_usuario_id uuid)   -- SOLO ADMIN
+    returns jsonb
+    - La ficha de un cliente: sus datos (incluido el mail, que sale de
+      auth.users) y TODAS sus reservas con el numero y la capacidad de
+      la cancha. El frontend separa proximas de historial.
+
+POR QUE ESTAS DOS SON FUNCIONES Y NO RLS: el mail vive en auth.users,
+que ningun cliente puede leer, y la policy de usuario solo deja ver el
+perfil de quien reservo en tu sede. Un admin tiene que poder listar
+tambien a los que nunca reservaron. Se resolvio con dos funciones
+SECURITY DEFINER acotadas a admin en vez de abrir la RLS de usuario.
+
 No hay pantalla para los bloqueos todavia: se invocan las funciones.
 El chequeo de admin es el mismo que para precios y configuracion,
 porque bloquear fechas es una decision de negocio y no una tarea

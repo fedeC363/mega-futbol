@@ -110,6 +110,20 @@ PANEL DE ADMIN (solo rol admin)
    tener historia larga habria que acumular totales en una tabla aparte
    antes de que el borrado se lleve las filas.
 
+4. Ver los PERFILES DE USUARIOS (usuarios_para_admin y
+   perfil_de_usuario). Es una seccion del panel, con su propio
+   listado.
+   - El listado trae solo clientes: los empleados no figuran. Tiene un
+     buscador por nombre o mail, porque puede haber muchos.
+   - La ficha de cada uno muestra sus datos de contacto (nombre, mail
+     y telefono), su estado de amonestaciones, sus reservas proximas y
+     su historial.
+   - Si esta suspendido o vetado, aparece el boton para levantarlo, que
+     llama a levantar_sancion, la misma funcion de siempre. No se creo
+     ninguna funcion nueva para eso.
+   - El mail se muestra solo acá: es el unico lugar del sistema donde
+     un admin ve el mail de un usuario.
+
 Cambiar un precio no afecta a las reservas ya hechas: cada una congela
 su precio_total al crearse (spec 01).
 
