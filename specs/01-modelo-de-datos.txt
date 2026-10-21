@@ -19,6 +19,13 @@ TABLA: usuario  (extiende a auth.users, no la reemplaza)
 - suspensiones      int, not null, default 0    -- cuantas cumplio
 - suspendido_hasta  timestamptz, nullable       -- no puede reservar hasta aca
 - vetado            boolean, not null, default false  -- veto permanente
+- terminos_aceptados_at timestamptz, nullable
+                      -- cuando acepto los terminos y condiciones;
+                         null = todavia no los acepto
+- terminos_version      text, nullable
+                      -- que version acepto. Hoy siempre la misma; esta
+                         para el dia que el texto cambie y haya que
+                         volver a pedir la aceptacion
 
 Notas:
 - El email y la contrasena los maneja Supabase Auth (auth.users), NO se

@@ -288,6 +288,13 @@ perfil de quien reservo en tu sede. Un admin tiene que poder listar
 tambien a los que nunca reservaron. Se resolvio con dos funciones
 SECURITY DEFINER acotadas a admin en vez de abrir la RLS de usuario.
 
+21) aceptar_terminos(p_version text)
+    returns void
+    - Marca que el usuario logueado acepto los terminos: guarda la
+      fecha y la version en su fila de usuario.
+    - Va por funcion y no por un update directo porque el cliente solo
+      tiene permiso de escribir nombre y telefono de su propia fila.
+
 No hay pantalla para los bloqueos todavia: se invocan las funciones.
 El chequeo de admin es el mismo que para precios y configuracion,
 porque bloquear fechas es una decision de negocio y no una tarea

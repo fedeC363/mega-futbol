@@ -119,12 +119,6 @@ REGLAS DE NEGOCIO CONFIRMADAS
     (Antes no habia jerarquia; se diferencio al agregar el panel de
     admin. Ver spec 04.)
 
-15. Inasistencias: si un usuario reserva y no se presenta, un empleado
-    lo marca y queda registrado. A las 2 inasistencias se le avisa; a
-    las 5, queda suspendido 2 meses sin poder reservar; si vuelve a
-    juntar 5 despues de cumplir una suspension, el veto es permanente.
-    Un admin puede levantar una sancion a mano.
-
 12. Zona horaria: todo el sistema asume America/Argentina/Buenos_Aires.
     No hay soporte multi-zona horaria por ahora.
 
@@ -136,6 +130,28 @@ REGLAS DE NEGOCIO CONFIRMADAS
 14. Contacto directo: la pagina debe exponer links directos a WhatsApp
     e Instagram de Mega Futbol. No hace falta un sistema de mensajeria
     propio.
+
+15. Inasistencias: si un usuario reserva y no se presenta, un empleado
+    lo marca y queda registrado. A las 2 inasistencias se le avisa; a
+    las 5, queda suspendido 2 meses sin poder reservar; si vuelve a
+    juntar 5 despues de cumplir una suspension, el veto es permanente.
+    Un admin puede levantar una sancion a mano.
+
+16. Terminos y condiciones: hay que aceptarlos para usar la
+    plataforma. El texto vive en web/src/content/terminos.txt, aparte
+    del codigo, para poder editarlo sin tocar componentes.
+    - Con sesion: se piden UNA sola vez. La aceptacion queda guardada
+      (usuario.terminos_aceptados_at) y no vuelve a aparecer. Tambien
+      se guarda que version acepto, por si el texto cambia mas
+      adelante; hoy esa comparacion no se hace.
+    - Sin sesion: se piden en CADA visita, hasta que se registre. No
+      hay donde guardar la aceptacion de alguien sin cuenta y tampoco
+      se guarda en el navegador, a proposito.
+    - El cartel tapa la pagina y no se puede cerrar sin aceptar. No hay
+      boton de rechazar: quien no acepta, no usa la plataforma.
+    - Un boton flotante con una "i", abajo a la derecha y en todas las
+      pantallas, abre el mismo texto en modo lectura, sin volver a
+      pedir la aceptacion.
 
 FUERA DE ALCANCE POR AHORA
 ----------------------------
