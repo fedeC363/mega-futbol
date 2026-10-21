@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Pelota de fútbol">
+  <title>Mega Fútbol</title>
+
+  <!--
+    Pelota de futbol para el favicon.
+
+    Un favicon se ve a 16 px: ahi no entran los veinte paños de una
+    pelota de verdad. Con el pentagono central y las cinco costuras
+    saliendo de sus vertices alcanza para que se lea la pelota, y
+    queda nitido en cualquier tamaño.
+
+    El oscuro es el verde casi negro de la marca: a simple vista lee
+    como negro pero combina con el resto.
+  -->
+  <circle cx="32" cy="32" r="27" fill="#ffffff" stroke="#0e1b14" stroke-width="4" />
+
+  <path d="M32 20 L43.41 28.29 L39.05 41.71 L24.95 41.71 L20.59 28.29 Z" fill="#0e1b14" />
+
+  <g stroke="#0e1b14" stroke-width="3.2" stroke-linecap="round">
+    <path d="M32 20 L32 7" />
+    <path d="M43.41 28.29 L55.77 24.27" />
+    <path d="M39.05 41.71 L46.69 52.22" />
+    <path d="M24.95 41.71 L17.31 52.22" />
+    <path d="M20.59 28.29 L8.23 24.27" />
+  </g>
+</svg>
