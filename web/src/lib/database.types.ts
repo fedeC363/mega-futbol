@@ -556,11 +556,27 @@ export type Database = {
           turnos_totales: number
         }[]
       }
+      perfil_de_usuario: { Args: { p_usuario_id: string }; Returns: Json }
       precio_turno: {
         Args: { p_hora: string; p_precio_base: number }
         Returns: number
       }
       sede_de_cancha: { Args: { p_cancha_id: string }; Returns: string }
+      usuarios_para_admin: {
+        Args: { p_busqueda?: string }
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          inasistencias: number
+          nombre: string
+          reservas_activas: number
+          suspendido_hasta: string
+          suspensiones: number
+          telefono: string
+          vetado: boolean
+        }[]
+      }
       validar_llegada: { Args: { p_reserva_id: string }; Returns: undefined }
     }
     Enums: {
