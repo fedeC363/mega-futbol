@@ -16,20 +16,32 @@ export function Header() {
   const abierto = parametros.data ? estaAbierto(parametros.data) : null;
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-cream/8 bg-linear-to-b from-pitch-2 to-pitch px-[18px] pt-[22px] pb-3.5 md:static md:px-8 md:py-[18px]">
-      <Link to="/" className="block">
-        <div className="font-display text-[26px] leading-none font-bold tracking-[0.3px]">
-          MEGA <span className="text-orange">FÚTBOL</span>
-        </div>
-        <div className="mt-[3px] text-xs text-cream-dim">
-          {sede.data ? `Sede ${sede.data.nombre}` : ' '}
-        </div>
+    // Tres columnas (vacia | logo | estado): con la primera vacia, el
+    // logo cae en el centro exacto aunque el cartel de la derecha
+    // cambie de ancho. En pantallas angostas, una sola columna.
+    <header className="sticky top-0 z-20 grid grid-cols-1 items-center gap-3.5 border-b border-cream/8 bg-linear-to-b from-pitch-2 to-pitch px-4 py-5 sm:grid-cols-[1fr_auto_1fr] sm:gap-0 sm:px-8 sm:pt-[26px] sm:pb-6 md:static">
+      <Link to="/" className="justify-self-center text-center leading-none sm:col-start-2">
+        <span className="block font-display text-[40px] font-bold tracking-[1px] uppercase sm:text-[52px]">
+          Mega <span className="text-orange">Fútbol</span>
+        </span>
+
+        {/* Las dos rayitas al costado se dibujan con before/after. Hasta
+            que carga el nombre de la sede queda invisible pero ocupando
+            su lugar, para que el logo no salte. */}
+        <span
+          className={cn(
+            "mt-2 flex items-center justify-center gap-2.5 text-xs font-semibold tracking-[3px] text-cream-dim uppercase before:h-px before:w-7 before:bg-cream/25 before:content-[''] after:h-px after:w-7 after:bg-cream/25 after:content-['']",
+            !sede.data && 'invisible',
+          )}
+        >
+          Sede {sede.data?.nombre ?? 'San Justo'}
+        </span>
       </Link>
 
       {abierto !== null && (
         <div
           className={cn(
-            'flex items-center gap-1.5 rounded-full border py-[5px] pr-2.5 pl-2 text-[11px] md:py-1.5 md:pr-3 md:text-xs',
+            'flex items-center gap-1.5 justify-self-center rounded-full border py-1.5 pr-3 pl-2.5 text-xs sm:col-start-3 sm:justify-self-end',
             abierto
               ? 'border-turf-light/35 bg-turf-light/12 text-turf-light'
               : 'border-cream/15 bg-cream/5 text-cream-dim',
