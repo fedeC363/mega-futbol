@@ -282,6 +282,14 @@ IMMUTABLE.
       auth.users) y TODAS sus reservas con el numero y la capacidad de
       la cancha. El frontend separa proximas de historial.
 
+VERIFICADO CONTRA LA BASE (migracion verificacion_acceso_perfiles): un
+usuario comun autenticado no puede leer el perfil ni las reservas de
+otro desde las tablas, ni ejecutar usuarios_para_admin,
+perfil_de_usuario o levantar_sancion; y un admin si. La migracion no
+cambia el esquema, solo comprueba: si algo no estuviera protegido,
+falla y no se aplica. Para repetirla, se copia su bloque DO en el SQL
+Editor.
+
 POR QUE ESTAS DOS SON FUNCIONES Y NO RLS: el mail vive en auth.users,
 que ningun cliente puede leer, y la policy de usuario solo deja ver el
 perfil de quien reservo en tu sede. Un admin tiene que poder listar
