@@ -113,7 +113,7 @@ export function AdminPage() {
   );
 }
 
-type Campos = 'primer' | 'ultimo' | 'recargo' | 'porcentaje' | 'sena' | 'tope' | 'anticipacion';
+type Campos = 'primer' | 'ultimo' | 'recargo' | 'porcentaje' | 'sena' | 'tope';
 
 function FormularioParametros({ config, onGuardado }: { config: Configuracion; onGuardado: () => void }) {
   const [valores, setValores] = useState<Record<Campos, string>>({
@@ -123,7 +123,6 @@ function FormularioParametros({ config, onGuardado }: { config: Configuracion; o
     porcentaje: String(Math.round((config.factor_recargo - 1) * 100)),
     sena: String(Math.round(config.monto_sena)),
     tope: String(config.max_reservas_activas),
-    anticipacion: String(config.dias_anticipacion_max),
   });
   const [errores, setErrores] = useState<Partial<Record<Campos, string>>>({});
   const [guardando, setGuardando] = useState(false);
@@ -147,7 +146,6 @@ function FormularioParametros({ config, onGuardado }: { config: Configuracion; o
     const porcentaje = validarEntero(valores.porcentaje, { min: 0, max: 200 });
     const sena = validarEntero(valores.sena, { min: 1, max: 10_000_000 });
     const tope = validarEntero(valores.tope, { min: 1, max: 20 });
-    const anticipacion = validarEntero(valores.anticipacion, { min: 1, max: 365 });
 
     const nuevos: Partial<Record<Campos, string>> = {};
     if (!primer.ok) nuevos.primer = primer.error;
@@ -156,7 +154,6 @@ function FormularioParametros({ config, onGuardado }: { config: Configuracion; o
     if (!porcentaje.ok) nuevos.porcentaje = porcentaje.error;
     if (!sena.ok) nuevos.sena = sena.error;
     if (!tope.ok) nuevos.tope = tope.error;
-    if (!anticipacion.ok) nuevos.anticipacion = anticipacion.error;
 
     // Reglas cruzadas: las mismas que tiene la base como checks, pero
     // avisadas antes de ir y volver.
@@ -171,7 +168,7 @@ function FormularioParametros({ config, onGuardado }: { config: Configuracion; o
       setErrores(nuevos);
       return;
     }
-    if (!primer.ok || !ultimo.ok || !recargo.ok || !porcentaje.ok || !sena.ok || !tope.ok || !anticipacion.ok) return;
+    if (!primer.ok || !ultimo.ok || !recargo.ok || !porcentaje.ok || !sena.ok || !tope.ok) return;
 
     setGuardando(true);
     const { error } = await supabase.rpc('actualizar_configuracion', {
@@ -181,7 +178,6 @@ function FormularioParametros({ config, onGuardado }: { config: Configuracion; o
       p_factor_recargo: 1 + porcentaje.valor / 100,
       p_monto_sena: sena.valor,
       p_max_reservas_activas: tope.valor,
-      p_dias_anticipacion_max: anticipacion.valor,
     });
     setGuardando(false);
     if (error) return setError(mensajeDeError(error));
@@ -253,16 +249,6 @@ function FormularioParametros({ config, onGuardado }: { config: Configuracion; o
           onChange={escribir('tope')}
           error={errores.tope}
           ayuda="Por usuario, entre 1 y 20."
-          inputMode="numeric"
-          autoComplete="off"
-        />
-        <Campo
-          id="anticipacion"
-          etiqueta="Días de anticipación"
-          value={valores.anticipacion}
-          onChange={escribir('anticipacion')}
-          error={errores.anticipacion}
-          ayuda="Con cuánto tiempo se puede reservar."
           inputMode="numeric"
           autoComplete="off"
         />

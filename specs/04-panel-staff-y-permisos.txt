@@ -88,8 +88,11 @@ PANEL DE ADMIN (solo rol admin)
    (actualizar_cancha), o dar de alta/baja todas las de la sede juntas
    (actualizar_canchas_sede).
 2. Cambiar los parametros globales: horario del primer y del ultimo
-   turno, hora y porcentaje del recargo, monto de la seña, tope de
-   reservas activas y dias de anticipacion (actualizar_configuracion).
+   turno, hora y porcentaje del recargo, monto de la seña y tope de
+   reservas activas (actualizar_configuracion).
+   dias_anticipacion_max quedo FUERA del panel: la regla sigue vigente
+   en la base (30 dias, la valida crear_reserva) pero ya no se edita
+   desde la web; para cambiarla hace falta una migracion.
 
 3. Ver las ESTADISTICAS del predio, en una pestaña aparte del menu
    (estadisticas_del_predio). Tres graficos:
