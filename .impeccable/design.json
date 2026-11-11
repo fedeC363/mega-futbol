@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T00:00:00-03:00",
+  "title": "Design System: Mega Fútbol",
+  "extensions": {
+    "colorMeta": {
+      "night": {
+        "role": "neutral",
+        "displayName": "night",
+        "tonalRamp": [
+          "#1e2e25",
+          "#30503e",
+          "#3f7456",
+          "#4fa576",
+          "#79b995",
+          "#a5cbb5",
+          "#cedfd5",
+          "#f0f4f2"
+        ]
+      },
+      "pitch": {
+        "role": "neutral",
+        "displayName": "pitch",
+        "tonalRamp": [
+          "#1f2d26",
+          "#324e3f",
+          "#427057",
+          "#55a077",
+          "#7db597",
+          "#a7c8b6",
+          "#cfded6",
+          "#f0f4f2"
+        ]
+      },
+      "pitch-2": {
+        "role": "neutral",
+        "displayName": "pitch-2",
+        "tonalRamp": [
+          "#1e2e26",
+          "#30503e",
+          "#3f7357",
+          "#50a577",
+          "#79b996",
+          "#a5cab6",
+          "#cedfd5",
+          "#f0f4f2"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "panel",
+        "tonalRamp": [
+          "#202d25",
+          "#334d3d",
+          "#446e55",
+          "#589d73",
+          "#7fb393",
+          "#a8c7b4",
+          "#cfddd5",
+          "#f1f4f2"
+        ]
+      },
+      "predio": {
+        "role": "neutral",
+        "displayName": "predio",
+        "tonalRamp": [
+          "#1f2d25",
+          "#324d3e",
+          "#437056",
+          "#569f76",
+          "#7db596",
+          "#a7c8b6",
+          "#cfded5",
+          "#f0f4f2"
+        ]
+      },
+      "turf": {
+        "role": "secondary",
+        "displayName": "turf",
+        "tonalRamp": [
+          "#1a3325",
+          "#27593e",
+          "#308256",
+          "#37bd74",
+          "#67cb95",
+          "#9ad5b5",
+          "#c9e4d5",
+          "#eff6f2"
+        ]
+      },
+      "turf-light": {
+        "role": "secondary",
+        "displayName": "turf-light",
+        "tonalRamp": [
+          "#1b3225",
+          "#29573d",
+          "#337f55",
+          "#3db874",
+          "#6bc794",
+          "#9cd3b5",
+          "#cae3d5",
+          "#eff5f2"
+        ]
+      },
+      "occupied": {
+        "role": "tertiary",
+        "displayName": "occupied",
+        "tonalRamp": [
+          "#242826",
+          "#3b443f",
+          "#526158",
+          "#6e8678",
+          "#90a297",
+          "#b2bdb6",
+          "#d4d9d6",
+          "#f2f3f2"
+        ]
+      },
+      "mostaza": {
+        "role": "tertiary",
+        "displayName": "mostaza",
+        "tonalRamp": [
+          "#352d17",
+          "#5e4d22",
+          "#8a7028",
+          "#ca9f2b",
+          "#d5b45d",
+          "#dbc894",
+          "#e6dec6",
+          "#f6f4ee"
+        ]
+      },
+      "ladrillo": {
+        "role": "tertiary",
+        "displayName": "ladrillo",
+        "tonalRamp": [
+          "#331c19",
+          "#5a2b26",
+          "#84382e",
+          "#c04435",
+          "#cd7065",
+          "#d6a099",
+          "#e4cbc8",
+          "#f6f0ef"
+        ]
+      },
+      "orange": {
+        "role": "primary",
+        "displayName": "orange",
+        "tonalRamp": [
+          "#3a1d13",
+          "#672d18",
+          "#9a3b19",
+          "#e44911",
+          "#e8744a",
+          "#e6a289",
+          "#ecccc1",
+          "#f7f0ed"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "ink",
+        "tonalRamp": [
+          "#352117",
+          "#5e3622",
+          "#8b4928",
+          "#cb5f29",
+          "#d6855c",
+          "#dbac94",
+          "#e7d1c6",
+          "#f6f1ee"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "cream",
+        "tonalRamp": [
+          "#30291d",
+          "#53462d",
+          "#79643a",
+          "#ae8b47",
+          "#bfa673",
+          "#cebfa1",
+          "#e1dacc",
+          "#f5f3f0"
+        ]
+      },
+      "cream-dim": {
+        "role": "neutral",
+        "displayName": "cream-dim",
+        "tonalRamp": [
+          "#242925",
+          "#3b453e",
+          "#516257",
+          "#6d8876",
+          "#8fa396",
+          "#b1beb6",
+          "#d3d9d5",
+          "#f2f3f2"
+        ]
+      },
+      "turf-text": {
+        "role": "secondary",
+        "displayName": "turf-text",
+        "tonalRamp": [
+          "#1b3225",
+          "#29573d",
+          "#337f55",
+          "#3db874",
+          "#52b07c",
+          "#9cd3b5",
+          "#cae3d5",
+          "#eff5f2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Logo MEGA FÚTBOL del header, en mayúsculas."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Título de cada pantalla."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Botones y texto destacado en tarjetas."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corriente, mensajes y descripciones."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Etiquetas de filtros y secciones en mayúsculas."
+      }
+    },
+    "shadows": [
+      {
+        "name": "cancha-reposo",
+        "value": "0 6px 14px rgba(0,0,0,0.35)",
+        "purpose": "Cancha clickeable levantada del terreno."
+      },
+      {
+        "name": "cancha-press",
+        "value": "0 2px 4px rgba(0,0,0,0.3)",
+        "purpose": "Punto más hundido del pulso de la cancha."
+      },
+      {
+        "name": "badge",
+        "value": "0 4px 10px rgba(0,0,0,0.25)",
+        "purpose": "Número de cancha apoyado sobre el césped."
+      },
+      {
+        "name": "reflector",
+        "value": "0 8px 20px rgba(242,98,46,0.4)",
+        "purpose": "Botón flotante naranja del menú en celular."
+      }
+    ],
+    "motion": [
+      {
+        "name": "cancha-press",
+        "value": "260ms cubic-bezier(0.3, 0.7, 0.4, 1)",
+        "purpose": "Pulso único al entrar el mouse en una cancha; se anula con prefers-reduced-motion."
+      },
+      {
+        "name": "subir",
+        "value": "0.28s cubic-bezier(0.22, 0.9, 0.35, 1)",
+        "purpose": "Entrada desde abajo (translateY 100% a 0)."
+      },
+      {
+        "name": "fab-stagger",
+        "value": "200ms, 30ms entre ítems",
+        "purpose": "Despliegue escalonado del menú flotante en celular."
+      },
+      {
+        "name": "press",
+        "value": "scale(0.98)",
+        "purpose": "Botones al presionarse; las canchas usan scale(0.94)."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "La única acción principal de la pantalla.",
+      "html": "<button class=\"ds-btn-primaria\">Reservar turno</button>",
+      "css": ".ds-btn-primaria { background: #f2622e; color: #1a0c05; border: none; border-radius: 12px; padding: 12px 16px; font: 600 15px 'Work Sans', system-ui, sans-serif; cursor: pointer; transition: filter .15s, transform .15s; } .ds-btn-primaria:hover { filter: brightness(1.1); } .ds-btn-primaria:active { transform: scale(.98); } .ds-btn-primaria:focus-visible { outline: 2px solid #f3ede1; outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción alternativa junto a la primaria.",
+      "html": "<button class=\"ds-btn-secundaria\">Volver</button>",
+      "css": ".ds-btn-secundaria { background: rgba(243,237,225,.05); color: #f3ede1; border: 1px solid rgba(243,237,225,.15); border-radius: 12px; padding: 12px 16px; font: 600 15px 'Work Sans', system-ui, sans-serif; cursor: pointer; transition: background .15s, transform .15s; } .ds-btn-secundaria:hover { background: rgba(243,237,225,.1); } .ds-btn-secundaria:active { transform: scale(.98); } .ds-btn-secundaria:focus-visible { outline: 2px solid #f2622e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón burbuja",
+      "kind": "button",
+      "refersTo": "button-burbuja",
+      "description": "Acción secundaria que acompaña a un control sin competir.",
+      "html": "<button class=\"ds-btn-burbuja\">Ver precios</button>",
+      "css": ".ds-btn-burbuja { background: rgba(243,237,225,.04); color: #9fb3a6; border: 1px solid rgba(243,237,225,.15); border-radius: 9999px; padding: 12px 16px; font: 600 15px 'Work Sans', system-ui, sans-serif; cursor: pointer; transition: all .15s; } .ds-btn-burbuja:hover { border-color: rgba(242,98,46,.4); background: rgba(242,98,46,.1); color: #f3ede1; } .ds-btn-burbuja:focus-visible { outline: 2px solid #f2622e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo",
+      "kind": "input",
+      "refersTo": "campo",
+      "description": "Campo de texto con etiqueta arriba y error propio en castellano.",
+      "html": "<label class=\"ds-campo\"><span class=\"ds-campo-etiqueta\">Email</span><input class=\"ds-campo-input\" placeholder=\"vos@mail.com\" /></label>",
+      "css": ".ds-campo { display: block; font-family: 'Work Sans', system-ui, sans-serif; } .ds-campo-etiqueta { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 500; color: #9fb3a6; } .ds-campo-input { width: 100%; background: #0e1b14; color: #f3ede1; border: 1px solid rgba(243,237,225,.12); border-radius: 10px; padding: 12px 14px; font-size: 15px; outline: none; transition: border-color .15s; } .ds-campo-input::placeholder { color: rgba(159,179,166,.7); } .ds-campo-input:focus, .ds-campo-input:focus-visible { border-color: #f2622e; }"
+    },
+    {
+      "name": "Insignia de estado",
+      "kind": "chip",
+      "description": "Estado de una reserva: pendiente en naranja, confirmada en verde.",
+      "html": "<span class=\"ds-insignia ds-insignia-pendiente\">Pendiente de seña</span> <span class=\"ds-insignia ds-insignia-confirmada\">Confirmada</span>",
+      "css": ".ds-insignia { display: inline-block; border: 1px solid; border-radius: 9999px; padding: 2px 10px; font: 500 11px 'Work Sans', system-ui, sans-serif; white-space: nowrap; } .ds-insignia-pendiente { border-color: rgba(242,98,46,.5); background: rgba(242,98,46,.1); color: #f2622e; } .ds-insignia-confirmada { border-color: rgba(44,138,86,.4); background: rgba(44,138,86,.15); color: #52b07c; }"
+    },
+    {
+      "name": "Tarjeta",
+      "kind": "card",
+      "refersTo": "tarjeta",
+      "description": "Contenedor plano de paneles y listas.",
+      "html": "<div class=\"ds-tarjeta\"><strong>Cancha 7 · F7</strong><p>Hoy 20:00 · $52.800</p></div>",
+      "css": ".ds-tarjeta { background: #16281d; color: #f3ede1; border: 1px solid rgba(243,237,225,.1); border-radius: 12px; padding: 14px 16px; font: 400 14px 'Work Sans', system-ui, sans-serif; transition: border-color .15s; } .ds-tarjeta p { margin: 4px 0 0; font-size: 13px; color: #9fb3a6; } .ds-tarjeta:hover { border-color: rgba(243,237,225,.25); }"
+    },
+    {
+      "name": "Selector de día",
+      "kind": "custom",
+      "refersTo": "dia-activo",
+      "description": "Tira de días; el elegido se llena de naranja.",
+      "html": "<div class=\"ds-dias\"><button class=\"ds-dia ds-dia-activo\"><span>MIÉ</span><b>11</b></button><button class=\"ds-dia\"><span>JUE</span><b>12</b></button><button class=\"ds-dia\"><span>VIE</span><b>13</b></button></div>",
+      "css": ".ds-dias { display: flex; gap: 8px; } .ds-dia { display: flex; flex-direction: column; align-items: center; min-width: 58px; border: 1px solid rgba(243,237,225,.1); background: #16281d; color: #9fb3a6; border-radius: 10px; padding: 6px 12px; cursor: pointer; transition: color .15s; } .ds-dia span { font: 500 11px 'Work Sans', system-ui, sans-serif; letter-spacing: .025em; } .ds-dia b { font: 700 18px/1.25 'Barlow Condensed', system-ui, sans-serif; } .ds-dia:hover { color: #f3ede1; } .ds-dia:focus-visible { outline: 2px solid #f2622e; outline-offset: 2px; } .ds-dia-activo { background: #f2622e; border-color: #f2622e; color: #1a0c05; }"
+    },
+    {
+      "name": "Cancha del mapa",
+      "kind": "custom",
+      "refersTo": "cancha-badge",
+      "description": "Cancha disponible con sus líneas, badge de número y pulso al pasar el mouse.",
+      "html": "<button class=\"ds-cancha\" aria-label=\"Cancha 7, fútbol 7, disponible\"><svg viewBox=\"0 0 100 100\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" vector-effect=\"non-scaling-stroke\"><rect x=\"4\" y=\"6\" width=\"92\" height=\"88\" rx=\"2\"/><line x1=\"50\" y1=\"6\" x2=\"50\" y2=\"94\"/><rect x=\"4\" y=\"28\" width=\"12\" height=\"44\"/><rect x=\"84\" y=\"28\" width=\"12\" height=\"44\"/></g></svg><i class=\"ds-cancha-circulo\"></i><span class=\"ds-cancha-badge\">7<small>F7</small></span></button>",
+      "css": ".ds-cancha { position: relative; display: flex; align-items: center; justify-content: center; width: 200px; height: 120px; overflow: hidden; border: 1px solid rgba(243,237,225,.15); border-radius: 10px; background: #1f6e43; color: rgba(243,237,225,.6); box-shadow: 0 6px 14px rgba(0,0,0,.35); cursor: pointer; } .ds-cancha svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; } .ds-cancha-circulo { position: absolute; top: 50%; left: 50%; height: 58%; aspect-ratio: 1; transform: translate(-50%,-50%); border: 2px solid currentColor; border-radius: 9999px; } .ds-cancha-badge { position: relative; z-index: 1; min-width: 36px; padding: 7px 10px 6px; border-radius: 8px; background: #f2622e; color: #1a0c05; text-align: center; font: 700 17px/1 'Barlow Condensed', system-ui, sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,.25); } .ds-cancha-badge small { display: block; margin-top: 2px; font: 500 8.5px 'Work Sans', system-ui, sans-serif; letter-spacing: .3px; color: #3a1d0d; } @keyframes ds-cancha-press { 0% { transform: scale(1); box-shadow: 0 6px 14px rgba(0,0,0,.35); } 35% { transform: scale(.94); box-shadow: 0 2px 4px rgba(0,0,0,.3); } 100% { transform: scale(1); box-shadow: 0 6px 14px rgba(0,0,0,.35); } } .ds-cancha:hover { animation: ds-cancha-press 260ms cubic-bezier(.3,.7,.4,1) 1; } .ds-cancha:active { transform: scale(.94); } .ds-cancha:focus-visible { outline: 2px solid #f3ede1; outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-cancha:hover { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Cancha de noche",
+    "overview": "El predio con las luces prendidas. Toda la interfaz vive sobre verdes casi negros (`pitch`, `night`) que funcionan como la oscuridad alrededor de las canchas. Lo que importa se ilumina: las canchas libres en verde césped, y el naranja aparece solo donde hay que actuar, como un reflector. La página principal es el mapa del predio visto desde arriba; cada cancha se dibuja con sus líneas reales (perímetro, mitad, áreas, círculo central) y su color dice cuánto está ocupada ese día.\n\nLos componentes son táctiles y deportivos: responden al tocarlos. La cancha se hunde y vuelve al pasar el mouse, los botones se achican apenas al presionarlos y el menú en celular se abre en abanico desde un botón naranja. La densidad es media: el panel de staff y admin usa el mismo lenguaje que la parte del jugador, con tarjetas oscuras y tipografía chica, para que se lea rápido en el día a día.\n\nEs un tema oscuro único; no hay modo claro. La interfaz está en castellano rioplatense.",
+    "keyCharacteristics": [
+      "Fondo verde noche en capas tonales, sin blancos de fondo.",
+      "Un solo acento de acción: `orange`. Nada de rojo.",
+      "Titulares condensados en mayúsculas (Barlow Condensed) sobre cuerpo Work Sans chico.",
+      "El mapa del predio es la pieza central y la que define el carácter.",
+      "Respuesta física al toque: press, pulso y despliegue, siempre respetando `prefers-reduced-motion`."
+    ],
+    "rules": [
+      {
+        "name": "The One Reflector Rule",
+        "body": "`orange` es el único color de acción. Si algo naranja no se puede tocar ni indica error o pendiente, sobra.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Red Rule",
+        "body": "No existe un rojo de error. Los errores y lo pendiente usan `orange`; `ladrillo` solo significa \"cancha casi llena\" en el mapa.",
+        "section": "colors"
+      },
+      {
+        "name": "The Contrast-Swap Rule",
+        "body": "El badge de la cancha es naranja sobre `turf`, pero `cream` sobre `mostaza` y `ladrillo`, porque el naranja se pierde contra fondos cálidos.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dorsal Rule",
+        "body": "Todo número que identifica algo (cancha, día) va en Barlow Condensed bold; los precios y textos corridos van en Work Sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lift-Means-Touch Rule",
+        "body": "Si algo tiene sombra, se puede tocar o flota sobre la página. Las tarjetas y paneles son planos.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar `orange` con texto `ink` para la única acción principal de cada pantalla.",
+      "Do separar superficies con capas tonales (`pitch`, luego `pitch-2` o `panel`) y bordes `cream` al 8–15%.",
+      "Do escribir los números de cancha y de día en Barlow Condensed bold.",
+      "Do cortar toda animación con `prefers-reduced-motion`, como hace el pulso de la cancha.",
+      "Do mantener los tokens en `web/src/index.css` (`@theme`) y cambiar la paleta solo ahí.",
+      "Do pedirle a Federico el boceto antes de construir una pantalla nueva; el diseño visual lo define él."
+    ],
+    "donts": [
+      "Don't usar `turf-light` como color de texto; para texto va `turf-text`.",
+      "Don't usar emoji como íconos; van los de `Iconos.tsx`.",
+      "Don't usar rojo para errores; los errores van en `orange`.",
+      "Don't poner `orange` sobre `mostaza` o `ladrillo`; ahí el badge va en `cream`.",
+      "Don't usar texto blanco sobre `orange`; siempre `ink`.",
+      "Don't agregar un modo claro ni fondos blancos.",
+      "Don't usar mensajes de validación nativos del navegador ni steppers nativos en los campos numéricos.",
+      "Don't dar sombra a tarjetas o paneles estáticos; la sombra significa que se puede tocar o que flota."
+    ]
+  }
+}
