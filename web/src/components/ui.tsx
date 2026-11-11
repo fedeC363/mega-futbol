@@ -58,7 +58,7 @@ export function Campo({
         aria-describedby={error ? `${id}-error` : undefined}
         {...props}
         className={cn(
-          'w-full rounded-[10px] border bg-pitch px-3.5 py-3 text-[15px] text-cream outline-none placeholder:text-cream-dim/50 focus:border-orange',
+          'w-full rounded-[10px] border bg-pitch px-3.5 py-3 text-[15px] text-cream outline-none placeholder:text-cream-dim/70 focus:border-orange',
           error ? 'border-orange' : 'border-cream/12',
         )}
       />

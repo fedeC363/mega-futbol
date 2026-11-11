@@ -111,13 +111,12 @@ export function IngresarPage() {
       }
       ancho="max-w-md"
     >
-      <div role="tablist" className="mb-5 grid grid-cols-2 gap-1 rounded-xl border border-cream/10 bg-panel p-1">
+      <div role="group" aria-label="Tengo cuenta o soy nuevo" className="mb-5 grid grid-cols-2 gap-1 rounded-xl border border-cream/10 bg-panel p-1">
         {(['ingresar', 'registro'] as const).map((m) => (
           <button
             key={m}
             type="button"
-            role="tab"
-            aria-selected={modo === m}
+            aria-pressed={modo === m}
             onClick={() => {
               setModo(m);
               setError(null);

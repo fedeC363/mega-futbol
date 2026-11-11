@@ -364,7 +364,7 @@ function AccionesMasivas({
           <Aviso>{error}</Aviso>
         </div>
       )}
-      {mensaje && <p className="mt-2 text-[12px] text-turf-light">{mensaje}</p>}
+      {mensaje && <p className="mt-2 text-[12px] text-turf-text">{mensaje}</p>}
     </div>
   );
 }

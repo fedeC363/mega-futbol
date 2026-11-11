@@ -3,9 +3,10 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { cn } from '../lib/cn';
 import { BEELUP_URL } from '../lib/contacto';
+import { Icono, type NombreIcono } from './Iconos';
 
 interface Item {
-  icono: string;
+  icono: NombreIcono;
   etiqueta: string;
   /** Ruta interna, o `href` para links externos (Beelup). */
   to?: string;
@@ -27,18 +28,26 @@ export function SideMenu() {
   // Al navegar se cierra el FAB.
   useEffect(() => setFabAbierto(false), [pathname]);
 
+  // Escape cierra el menu abierto, como cualquier menu desplegable.
+  useEffect(() => {
+    if (!fabAbierto) return;
+    const alPresionar = (e: KeyboardEvent) => e.key === 'Escape' && setFabAbierto(false);
+    window.addEventListener('keydown', alPresionar);
+    return () => window.removeEventListener('keydown', alPresionar);
+  }, [fabAbierto]);
+
   const items: Item[] = [
-    { icono: '📅', etiqueta: 'Reservar', to: '/' },
-    { icono: '👤', etiqueta: 'Perfil', to: '/perfil' },
-    { icono: '📹', etiqueta: 'Beelup', href: BEELUP_URL },
-    { icono: '💬', etiqueta: 'Contacto y redes', to: '/contacto' },
+    { icono: 'calendario', etiqueta: 'Reservar', to: '/' },
+    { icono: 'perfil', etiqueta: 'Perfil', to: '/perfil' },
+    { icono: 'camara', etiqueta: 'Beelup', href: BEELUP_URL },
+    { icono: 'chat', etiqueta: 'Contacto y redes', to: '/contacto' },
     // Solo para quien tiene una fila activa en empleado.
-    ...(empleado ? [{ icono: '🗂️', etiqueta: 'Panel de staff', to: '/staff' }] : []),
+    ...(empleado ? [{ icono: 'staff', etiqueta: 'Panel de staff', to: '/staff' } satisfies Item] : []),
     // Precios, configuracion y numeros: solo rol admin.
     ...(esAdmin
       ? [
-          { icono: '⚙️', etiqueta: 'Panel de admin', to: '/admin' },
-          { icono: '📊', etiqueta: 'Estadísticas', to: '/estadisticas' },
+          { icono: 'ajustes', etiqueta: 'Panel de admin', to: '/admin' } satisfies Item,
+          { icono: 'grafico', etiqueta: 'Estadísticas', to: '/estadisticas' } satisfies Item,
         ]
       : []),
   ];
@@ -61,9 +70,7 @@ export function SideMenu() {
               )
             }
           >
-            <span className="w-5 shrink-0 text-center text-base" aria-hidden="true">
-              {item.icono}
-            </span>
+            <Icono nombre={item.icono} className="size-5 shrink-0" />
             {item.etiqueta}
           </EnlaceMenu>
         ))}
@@ -85,8 +92,8 @@ export function SideMenu() {
               )
             }
           >
-            <span className="flex size-[26px] items-center justify-center rounded-full bg-turf-light text-[13px]" aria-hidden="true">
-              {item.icono}
+            <span className="flex size-[26px] items-center justify-center rounded-full bg-turf-light text-ink" aria-hidden="true">
+              <Icono nombre={item.icono} className="size-4" />
             </span>
             {item.etiqueta}
           </EnlaceMenu>
@@ -97,11 +104,11 @@ export function SideMenu() {
           aria-expanded={fabAbierto}
           aria-label={fabAbierto ? 'Cerrar menú' : 'Abrir menú'}
           className={cn(
-            'flex size-[54px] items-center justify-center rounded-full bg-orange text-[22px] text-ink shadow-[0_8px_20px_rgba(242,98,46,0.4)] transition-transform duration-200',
-            fabAbierto && 'rotate-45',
+            'flex size-[54px] items-center justify-center rounded-full bg-orange text-ink shadow-[0_8px_20px_rgba(242,98,46,0.4)] transition-transform duration-200',
+            fabAbierto && 'rotate-90',
           )}
         >
-          ☰
+          <Icono nombre={fabAbierto ? 'cerrar' : 'menu'} className="size-6" />
         </button>
       </div>
     </>

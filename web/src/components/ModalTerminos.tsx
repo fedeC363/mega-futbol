@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { TERMINOS_TEXTO } from '../content/terminos';
+import { Icono } from './Iconos';
 import { Aviso, Boton } from './ui';
 
 /**
@@ -25,23 +27,57 @@ export function ModalTerminos({
 }) {
   const esLectura = modo === 'lectura';
 
+  const caja = useRef<HTMLDivElement>(null);
+
+  // Al cerrar, el foco vuelve a donde estaba (por ejemplo, el boton "i").
+  // Se toma en el render: el autoFocus de adentro mueve el foco antes de
+  // que corra cualquier efecto.
+  const [antes] = useState(() => document.activeElement as HTMLElement | null);
+  useEffect(() => () => antes?.focus(), [antes]);
+
   useEffect(() => {
     // Mientras está abierto, la página de atrás no scrollea.
     const previo = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    // La app de atras queda inerte: Tab no se escapa del modal y los
+    // lectores de pantalla solo leen el modal. Por eso el modal se monta
+    // fuera de #root (portal al body).
+    const raiz = document.getElementById('root');
+    raiz?.setAttribute('inert', '');
+    // Si el foco quedo afuera (en desarrollo, StrictMode monta dos veces y
+    // lo devuelve al boton "i"), va al boton principal, que es el ultimo.
+    if (!caja.current?.contains(document.activeElement)) {
+      [...(caja.current?.querySelectorAll<HTMLElement>('button') ?? [])].at(-1)?.focus();
+    }
 
     const alPresionar = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && esLectura) onCerrar?.();
+      if (e.key !== 'Tab' || !caja.current) return;
+      // Inert no alcanza: despues del ultimo boton, Tab se iria a la barra
+      // del navegador. Se cicla a mano entre los controles del modal.
+      const controles = [...caja.current.querySelectorAll<HTMLElement>('button:not([disabled]), [href]')];
+      if (!controles.length) return;
+      const primero = controles[0];
+      const ultimo = controles[controles.length - 1];
+      const dentro = caja.current.contains(document.activeElement);
+      if (e.shiftKey && (!dentro || document.activeElement === primero)) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && (!dentro || document.activeElement === ultimo)) {
+        e.preventDefault();
+        primero.focus();
+      }
     };
     window.addEventListener('keydown', alPresionar);
 
     return () => {
       document.body.style.overflow = previo;
+      raiz?.removeAttribute('inert');
       window.removeEventListener('keydown', alPresionar);
     };
   }, [esLectura, onCerrar]);
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -51,6 +87,7 @@ export function ModalTerminos({
       onClick={esLectura ? onCerrar : undefined}
     >
       <div
+        ref={caja}
         onClick={(e) => e.stopPropagation()}
         className="flex max-h-[86dvh] w-full max-w-2xl flex-col rounded-2xl border border-cream/12 bg-panel shadow-2xl"
       >
@@ -72,7 +109,7 @@ export function ModalTerminos({
               aria-label="Cerrar"
               className="flex size-7 shrink-0 items-center justify-center rounded-full bg-cream/8 text-cream-dim hover:text-cream"
             >
-              ✕
+              <Icono nombre="cerrar" className="size-4" />
             </button>
           )}
         </header>
@@ -98,6 +135,7 @@ export function ModalTerminos({
           )}
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

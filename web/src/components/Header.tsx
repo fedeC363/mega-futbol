@@ -43,7 +43,7 @@ export function Header() {
           className={cn(
             'flex items-center gap-1.5 justify-self-center rounded-full border py-1.5 pr-3 pl-2.5 text-xs sm:col-start-3 sm:justify-self-end',
             abierto
-              ? 'border-turf-light/35 bg-turf-light/12 text-turf-light'
+              ? 'border-turf-light/35 bg-turf-light/12 text-turf-text'
               : 'border-cream/15 bg-cream/5 text-cream-dim',
           )}
         >

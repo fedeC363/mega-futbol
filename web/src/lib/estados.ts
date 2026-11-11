@@ -8,7 +8,7 @@ export const ESTADOS: Record<EstadoReserva, { etiqueta: string; clases: string }
   },
   confirmada: {
     etiqueta: 'Confirmada',
-    clases: 'border-turf-light/40 bg-turf-light/15 text-turf-light',
+    clases: 'border-turf-light/40 bg-turf-light/15 text-turf-text',
   },
   cancelada: {
     etiqueta: 'Cancelada',

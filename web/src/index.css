@@ -13,6 +13,7 @@
   --color-predio: #122219;     /* el terreno, detras de las canchas */
   --color-turf: #1f6e43;       /* cancha disponible (base) */
   --color-turf-light: #2c8a56; /* cancha disponible (acento) */
+  --color-turf-text: #52b07c;  /* verde como texto: pasa 4.5:1 sobre los paneles */
   --color-occupied: #3a473f;   /* cancha sin turnos libres */
   --color-mostaza: #9c7a1f;    /* cancha con ocupacion media */
   --color-ladrillo: #7a2a20;   /* cancha casi llena */
@@ -42,6 +43,15 @@
     color: var(--color-cream);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+  /* Foco de teclado visible en todo control, con el acento de la marca. */
+  :focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(242 98 46 / 0.35);
+    color: var(--color-cream);
   }
   /* El selector de fecha nativo, legible sobre fondo oscuro. */
   input[type="date"] {

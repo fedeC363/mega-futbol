@@ -268,7 +268,7 @@ function ReservaLista({
 }) {
   return (
     <section className="mt-6">
-      <p className="inline-flex items-center gap-1.5 rounded-full border border-turf-light/40 bg-turf-light/12 px-2.5 py-1 text-xs text-turf-light">
+      <p className="inline-flex items-center gap-1.5 rounded-full border border-turf-light/40 bg-turf-light/12 px-2.5 py-1 text-xs text-turf-text">
         ✓ Reserva creada
       </p>
       <h2 className="mt-3 font-display text-[26px] leading-tight font-bold">Falta la seña para confirmarla</h2>
